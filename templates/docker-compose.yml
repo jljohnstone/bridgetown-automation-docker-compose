@@ -21,7 +21,7 @@ services:
 
     volumes:
       - .:${APP_DIR:-/home/user/bridgetown-app}
-      # this separates node_modules from the host
+      # this seperates node_modules from the host
       - node_modules:${APP_DIR:-/home/user/bridgetown-app}/node_modules
 
 volumes:
