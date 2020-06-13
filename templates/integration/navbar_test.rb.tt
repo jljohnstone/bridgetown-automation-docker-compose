@@ -1,0 +1,14 @@
+<% require 'erb' -%>
+<% @template_dir = File.expand_path('../', __dir__) -%>
+<% def read(filename)
+  ERB.new(File.read(File.join(@template_dir, 'integration', filename))).result(binding)
+end -%>
+require 'capybara_helper'
+
+<% if @framework == :minitest -%>
+<%= read("minitest.rb.tt") %>
+<% elsif @framework == :rspec -%>
+<%= read("rspec.rb.tt") %>
+<% elsif @framework == :test_unit -%>
+<%= read("test_unit.rb.tt") %>
+<% end %>

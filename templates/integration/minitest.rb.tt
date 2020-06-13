@@ -1,0 +1,5 @@
+class NavBarTest < CapybaraTestCase
+  def test_we_can_visit_page
+    visit("/")
+  end
+end
