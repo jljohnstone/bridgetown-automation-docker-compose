@@ -1,6 +1,6 @@
-FROM ruby:2.6-alpine3.11 as builder
+FROM ruby:<%= @docker_ruby_version %>-alpine as builder
 
-RUN apk add --no-cache --virtual \\
+RUN apk add --no-cache --virtual \
     # required
     nodejs-dev yarn bash \
     tzdata build-base libffi-dev \

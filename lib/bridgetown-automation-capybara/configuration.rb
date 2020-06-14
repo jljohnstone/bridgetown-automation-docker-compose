@@ -22,7 +22,7 @@ module CapybaraAutomation
 
     def initialize
       @framework = nil
-      @naming_convention =  nil
+      @naming_convention = nil
     end
 
     def frameworks
