@@ -9,7 +9,7 @@ module DockerAutomation
 
     # Invert so we can call TEST_FRAMEWORK_OPTIONS[1] #=> :rspec
     DISTROS = {
-      ubuntu: 1,
+      debian: 1,
       alpine: 2
     }.invert
 
@@ -22,24 +22,22 @@ module DockerAutomation
 
     attr_accessor :distro, :ruby_version
 
-    def frameworks
-      FRAMEWORKS
+    def ruby_versions
+      DOCKER_RUBY_VERSION
     end
 
-    def naming_conventions
-      NAMING_CONVENTION
+    def distros
+      DISTROS
     end
 
     def ask_questions
-      ask_for_testing_framework if @framework.nil?
-      ask_for_naming_convention if @naming_convention.nil?
+      ask_for_docker_ruby_version if @ruby_version.nil?
+      ask_for_distro if @distro.nil?
     end
 
     private
 
     def ask_for_input(question, answers)
-      answer = nil
-
       provide_input = "Please provide a number (1-#{answers.length})"
 
       allowable_answers = answers.keys
@@ -54,24 +52,24 @@ module DockerAutomation
       end
     end
 
-    def ask_for_testing_framework
-      question = 'What testing framework would you like to use?'
+    def ask_for_docker_ruby_version
+      question = 'What ruby version would you like to use?'
 
       answers = frameworks
 
       input = ask_for_input(question, answers)
 
-      @framework = answers[input]
+      @ruby_version = answers[input]
     end
 
-    def ask_for_naming_convention
-      question = 'What naming convention would you like use?'
+    def ask_for_distro
+      question = 'What linux distro would you like use?'
 
       answers = naming_conventions
 
       input = ask_for_input(question, answers)
 
-      @naming_convention = answers[input]
+      @distro = answers[input]
     end
   end
 end

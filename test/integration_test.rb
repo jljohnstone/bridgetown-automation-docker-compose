@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'shell'
 require 'open3'
 
-GITHUB_REPO_NAME = 'bridgetown-automation-capybara'
+GITHUB_REPO_NAME = 'bridgetown-automation-dockerfile'
 BRANCH = `git branch --show-current`.chomp.freeze || 'master'
 
 module CapybaraAutomation
@@ -22,12 +21,6 @@ module CapybaraAutomation
       File.read(File.join(TEMPLATES_DIR, filename))
     end
 
-    def run_pre_bundle_commands
-      Rake.sh('bundle config --local build.nokogiri --use-system-libraries')
-      Rake.sh('bundle config --local build.apparition --use-system-libraries')
-      Rake.sh('bundle install')
-    end
-
     def run_command(cmd, *inputs)
       Open3.popen3(cmd) do |stdin, stdout, _stderr, wait_thr|
         pid = wait_thr.pid
@@ -36,8 +29,6 @@ module CapybaraAutomation
 
         stdout.each_line do |line|
           puts line
-          puts '  ' + inputs[0] if line =~ /3.\) test_unit/
-          puts '  ' + inputs[1] if line =~ /2.\) spec/
         end
         exit_status = wait_thr.value
       end

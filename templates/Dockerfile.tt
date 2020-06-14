@@ -1,0 +1,11 @@
+<% require 'erb' -%>
+<% @template_dir = File.expand_path(__dir__) -%>
+<% def read(filename)
+  ERB.new(File.read(File.join(@template_dir, filename))).result(binding)
+end -%>
+<% if @distro == :debian -%>
+<%= read('Dockerfile_alpine.tt') %>
+<%=  %>
+<%= elsif @distro == :alpine -%>
+<%= read('Dockerfile_buster.tt') %>
+<% end -%>
