@@ -55,7 +55,7 @@ module DockerComposeAutomation
     def ask_for_docker_ruby_version
       question = 'What ruby version would you like to use?'
 
-      answers = frameworks
+      answers = ruby_versions
 
       input = ask_for_input(question, answers)
 
@@ -65,7 +65,7 @@ module DockerComposeAutomation
     def ask_for_distro
       question = 'What linux distro would you like use?'
 
-      answers = naming_conventions
+      answers = distros
 
       input = ask_for_input(question, answers)
 
