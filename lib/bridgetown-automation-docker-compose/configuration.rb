@@ -2,7 +2,7 @@
 
 require 'thor'
 
-module DockerAutomation
+module DockerComposeAutomation
   # Base configurations for a dockerfile
   class Configuration < Thor::Group
     include Thor::Actions

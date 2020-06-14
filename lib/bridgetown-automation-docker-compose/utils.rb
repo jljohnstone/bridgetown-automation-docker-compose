@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CapybaraAutomation
+module DockerComposeAutomation
   module Utils
   end
 end
