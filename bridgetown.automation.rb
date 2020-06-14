@@ -54,31 +54,6 @@ def read_template_file(filename)
   File.read(File.join(determine_template_dir, filename))
 end
 
-AutomationGem = Struct.new(:name, :version)
-
-def add_capybara_to_bundle
-  capybara = AutomationGem.new('capybara', '~> 3.3')
-  apparition = AutomationGem.new('apparition', '~> 0.5')
-
-  gems = [capybara, apparition]
-
-  append_gems_to_gemfile(gems)
-end
-
-def append_gems_to_gemfile(gems)
-  gems.each do |new_gem|
-    # Redirect to /dev/null so we dont clutter stdout
-    if system("bundle info #{new_gem.name} 1> /dev/null")
-      say "You already have #{new_gem} installed.", :red
-      say 'Skipping...\n', :red
-      next
-    end
-
-    data = "\ngem '#{new_gem.name}', '#{new_gem.version}', group: :bridgetown_plugins"
-    append_to_file('Gemfile', data)
-  end
-end
-
 def copy_capybara_file(config)
   FileUtils.mkdir_p(config.naming_convention.to_s)
   dest = File.join(config.naming_convention.to_s, 'capybara_helper.rb')
@@ -87,29 +62,13 @@ def copy_capybara_file(config)
   template(src, dest)
 end
 
-def copy_examples(config)
-  name = config.naming_convention.to_s
-  # Create an integration directory
-  dest_dir = File.join(name, 'integration')
-  dest_file = File.join(dest_dir, "navbar_#{name}.rb")
-  src_file = File.join(ROOT_PATH, 'templates', 'integration', 'navbar_test.rb')
-
-  FileUtils.mkdir_p(dest_dir)
-  template(src_file, dest_file)
-end
-
 add_template_repository_to_source_path
 require_libs
 
 @config = CapybaraAutomation::Configuration.new
 
-add_capybara_to_bundle
-run 'bundle install'
 @config.ask_questions
 
 # Set these so we can use them in our templates
-@framework = @config.framework
-@naming_convention = @config.naming_convention
-
-copy_capybara_file(@config)
-copy_examples(@config)
+@distro = @config.distro
+@ruby_version = @config.ruby_version

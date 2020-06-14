@@ -2,28 +2,25 @@
 
 require 'thor'
 
-module CapybaraAutomation
+module DockerAutomation
+  # Base configurations for a dockerfile
   class Configuration < Thor::Group
     include Thor::Actions
 
     # Invert so we can call TEST_FRAMEWORK_OPTIONS[1] #=> :rspec
-    FRAMEWORKS = {
-      rspec: 1,
-      minitest: 2,
-      test_unit: 3
+    DISTROS = {
+      ubuntu: 1,
+      alpine: 2
     }.invert
 
-    NAMING_CONVENTION = {
-      test: 1,
-      spec: 2
+    # Call it DOCKER_RUBY_VERSION to avoid name collision
+    DOCKER_RUBY_VERSION = {
+      '2.5': 1,
+      '2.6': 2,
+      '2.7': 3
     }.invert
 
-    attr_accessor :framework, :naming_convention
-
-    def initialize
-      @framework = nil
-      @naming_convention = nil
-    end
+    attr_accessor :distro, :ruby_version
 
     def frameworks
       FRAMEWORKS
