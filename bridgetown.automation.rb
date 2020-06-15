@@ -80,4 +80,8 @@ require_libs
 
 copy_template_files
 
-say "\nSuccessfully added docker files to your repo!", :green
+say "\nSuccessfully added files for Docker to your repo!", :green
+say "\nIf you're on Linux, to prevent permission issues, make sure to run:", :magenta
+say '`source ./docker.env && docker-compose up --build`', :red
+say "\nOn Mac & Windows, feel free to just run:", :magenta
+say '`docker-compose up --build`', :red
