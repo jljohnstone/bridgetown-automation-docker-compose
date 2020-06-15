@@ -5,7 +5,6 @@
 end -%>
 <% if @distro == :debian -%>
 <%= read('Dockerfile_alpine.tt') %>
-<%=  %>
-<%= elsif @distro == :alpine -%>
+<% elsif @distro == :alpine -%>
 <%= read('Dockerfile_buster.tt') %>
 <% end -%>

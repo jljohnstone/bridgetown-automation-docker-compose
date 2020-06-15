@@ -78,6 +78,6 @@ require_libs
 @distro = @config.distro
 @ruby_version = @config.ruby_version
 
-copy_files
+copy_template_files
 
 say 'Successfully copied a docker files into your repo!', :green

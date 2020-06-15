@@ -1,4 +1,4 @@
-FROM ruby:2.6 as builder
+FROM ruby:<%= @ruby_version %> as builder
 
 # Add yarn to repository list
 RUN curl https://deb.nodesource.com/setup_12.x | bash && \
