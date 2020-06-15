@@ -6,7 +6,7 @@ require 'open3'
 GITHUB_REPO_NAME = 'bridgetown-automation-docker-compose'
 BRANCH = `git branch --show-current`.chomp.freeze || 'master'
 
-module CapybaraAutomation
+module DockerComposeAutomation
   class IntegrationTest < Minitest::Test
     def setup
       Rake.rm_rf(TEST_APP)
@@ -35,10 +35,7 @@ module CapybaraAutomation
     end
 
     def run_assertions(framework:, naming_convention:)
-      helper_file = read_template_file("#{framework}_helper.rb.tt")
-      capybara_helper_file = read_test_file(File.join(naming_convention.to_s, 'capybara_helper.rb'))
-
-      assert_match(/#{helper_file}/, capybara_helper_file)
+      files = %w[.dockerignore docker.env docker.]
     end
 
     def test_it_works_with_local_automation

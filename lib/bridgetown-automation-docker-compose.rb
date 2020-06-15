@@ -5,4 +5,5 @@ require_relative "#{lib_name}/configuration"
 require_relative "#{lib_name}/utils"
 
 module DockerComposeAutomation
+  FILES = %w[docker-compose.yml .dockerignore Dockerfile compose.sh docker.env].freeze
 end
