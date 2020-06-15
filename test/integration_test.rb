@@ -13,8 +13,12 @@ module DockerComposeAutomation
       Rake.mkdir_p(TEST_APP)
     end
 
+    def test_file(filename)
+      File.join(TEST_APP, filename)
+    end
+
     def read_test_file(filename)
-      File.read(File.join(TEST_APP, filename))
+      File.read(test_file(filename))
     end
 
     def read_template_file(filename)
@@ -23,33 +27,59 @@ module DockerComposeAutomation
 
     def run_command(cmd, *inputs)
       Open3.popen3(cmd) do |stdin, stdout, _stderr, wait_thr|
-        pid = wait_thr.pid
+        wait_thr.pid
 
         inputs.flatten.each { |input| stdin.puts(input) }
 
         stdout.each_line do |line|
           puts line
         end
+
+        output = stdout
         exit_status = wait_thr.value
       end
     end
 
-    def run_assertions(framework:, naming_convention:)
-      files = %w[.dockerignore docker.env docker.]
+    def run_assertions(:ruby_version, :distro)
+      FILES.each do |file|
+        test_file = read_test_file(file)
+        template_file = read_template_file(file)
+        assert_match test_helper, template_file
+      end
+
+      # Check if ruby version loaded properly
+      dockerfile = read_test_file('Dockerfile')
+      ruby_regex = %r!FROM ruby:(?<ruby_version>\d+\.\d+)!
+      dockerfile_ruby_version = dockerfile.match(ruby_regex)[:ruby_version]
+      assert_equal dockerfile_ruby_version, ruby_version
+
+      # Check if distro loaded properly
+      distro_regex = %r!FROM ruby:.*-?(?<distro>\w+)!
+      distro_match = dockerfile.match(distro_regex)
+      assert distro_match
+
+      # Use the match group, if it doesnt exist, it means its debian based.
+      docker_distro = dockerfile.match[:distro] || :debian
+      assert_equal(distro, docker_distro)
     end
 
     def test_it_works_with_local_automation
       Rake.cd TEST_APP
 
-      run_pre_bundle_commands
       Rake.sh('bundle exec bridgetown new . --force ')
 
-      rspec = '1' # => :rspec
-      spec = '2' # => :spec
+      ruby_version = '2.6'
+      distro = :debian
 
-      run_command('bridgetown apply ../bridgetown.automation.rb', rspec, spec)
+      distros = Configuration::DISTROS.invert
+      ruby_versions = Configuration::DOCKER_RUBY_VERSIONS.invert
 
-      run_assertions(framework: :rspec, naming_convention: :spec)
+      distro_input = distros[distro]
+      ruby_version_input = distros[ruby_version]
+
+      run_command('bridgetown apply ../bridgetown.automation.rb', distro_input, ruby_version_input)
+
+      run_assertions(ruby_version: ruby_version, distro: distro)
     end
 
     # Have to push to github first, and wait for github to update

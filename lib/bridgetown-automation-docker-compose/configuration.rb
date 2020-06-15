@@ -13,8 +13,8 @@ module DockerComposeAutomation
       alpine: 2
     }.invert
 
-    # Call it DOCKER_RUBY_VERSION to avoid name collision
-    DOCKER_RUBY_VERSION = {
+    # Call it DOCKER_RUBY_VERSIONS to avoid name collision
+    DOCKER_RUBY_VERSIONS = {
       '2.5': 1,
       '2.6': 2,
       '2.7': 3
@@ -23,7 +23,7 @@ module DockerComposeAutomation
     attr_accessor :distro, :ruby_version
 
     def ruby_versions
-      DOCKER_RUBY_VERSION
+      DOCKER_RUBY_VERSIONS
     end
 
     def distros

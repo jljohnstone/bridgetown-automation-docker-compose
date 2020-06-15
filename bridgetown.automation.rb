@@ -63,7 +63,7 @@ def copy_template_file(name)
 end
 
 def copy_template_files
-  files = %w[docker.env compose.sh .dockerignore Dockerfile docker-compose.yml]
+  files = DockerComposeAutomation::FILES
   files.each { |file| copy_template_file(file) }
 end
 
@@ -80,4 +80,4 @@ require_libs
 
 copy_template_files
 
-say 'Successfully copied a docker files into your repo!', :green
+say "\nSuccessfully added docker files to your repo!", :green
