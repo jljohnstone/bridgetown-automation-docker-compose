@@ -22,7 +22,7 @@ module DockerComposeAutomation
     end
 
     def read_template_file(filename)
-      File.read(File.join(TEMPLATES_DIR, filename))
+      File.read(File.join(TEMPLATES_DIR, "#{filename}.tt"))
     end
 
     def run_command(cmd, *inputs)
@@ -35,26 +35,25 @@ module DockerComposeAutomation
           puts line
         end
 
-        output = stdout
         exit_status = wait_thr.value
       end
     end
 
-    def run_assertions(:ruby_version, :distro)
+    def run_assertions(ruby_version:, distro:)
       FILES.each do |file|
         test_file = read_test_file(file)
         template_file = read_template_file(file)
-        assert_match test_helper, template_file
+        assert_match test_file, template_file
       end
 
       # Check if ruby version loaded properly
       dockerfile = read_test_file('Dockerfile')
-      ruby_regex = %r!FROM ruby:(?<ruby_version>\d+\.\d+)!
+      ruby_regex = /FROM ruby:(?<ruby_version>\d+\.\d+)/
       dockerfile_ruby_version = dockerfile.match(ruby_regex)[:ruby_version]
       assert_equal dockerfile_ruby_version, ruby_version
 
       # Check if distro loaded properly
-      distro_regex = %r!FROM ruby:.*-?(?<distro>\w+)!
+      distro_regex = /FROM ruby:.*-?(?<distro>\w+)/
       distro_match = dockerfile.match(distro_regex)
       assert distro_match
 
@@ -74,8 +73,8 @@ module DockerComposeAutomation
       distros = Configuration::DISTROS.invert
       ruby_versions = Configuration::DOCKER_RUBY_VERSIONS.invert
 
-      distro_input = distros[distro]
-      ruby_version_input = distros[ruby_version]
+      distro_input = distros[distro].to_s
+      ruby_version_input = ruby_versions[:"#{ruby_version}"].to_s
 
       run_command('bridgetown apply ../bridgetown.automation.rb', distro_input, ruby_version_input)
 
