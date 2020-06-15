@@ -3,7 +3,7 @@
 require 'test_helper'
 require 'open3'
 
-GITHUB_REPO_NAME = 'bridgetown-automation-dockerfile'
+GITHUB_REPO_NAME = 'bridgetown-automation-docker-compose'
 BRANCH = `git branch --show-current`.chomp.freeze || 'master'
 
 module CapybaraAutomation

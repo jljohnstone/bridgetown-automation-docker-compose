@@ -2,7 +2,7 @@
 
 require 'thor'
 
-module DockerAutomation
+module DockerComposeAutomation
   # Base configurations for a dockerfile
   class Configuration < Thor::Group
     include Thor::Actions
@@ -55,7 +55,7 @@ module DockerAutomation
     def ask_for_docker_ruby_version
       question = 'What ruby version would you like to use?'
 
-      answers = frameworks
+      answers = ruby_versions
 
       input = ask_for_input(question, answers)
 
