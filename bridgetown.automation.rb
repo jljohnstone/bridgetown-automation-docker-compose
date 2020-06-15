@@ -62,32 +62,9 @@ def copy_template_file(name)
   template(src, dest)
 end
 
-def copy_docker_compose
-  copy_template_file('docker-compose.yml')
-end
-
-def copy_dockerfile
-  copy_template_file('Dockerfile')
-end
-
-def copy_dockerignore
-  copy_template_file('.dockerignore')
-end
-
-def copy_docker_env
-  copy_template_file('docker.env')
-end
-
-def copy_compose_sh
-  copy_template_file('compose.sh')
-end
-
-def copy_files
-  copy_docker_compose
-  copy_dockerfile
-  copy_dockerignore
-  copy_docker_env
-  copy_compose_sh
+def copy_template_files
+  files = %w[docker.env compose.sh .dockerignore Dockerfile docker-compose.yml]
+  files.each { |file| copy_template_file(file) }
 end
 
 add_template_repository_to_source_path
