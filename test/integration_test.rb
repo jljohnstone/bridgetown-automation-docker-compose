@@ -13,12 +13,8 @@ module DockerComposeAutomation
       Rake.mkdir_p(TEST_APP)
     end
 
-    def test_file(filename)
-      File.join(TEST_APP, filename)
-    end
-
     def read_test_file(filename)
-      File.read(test_file(filename))
+      File.read(File.join(TEST_APP, filename))
     end
 
     def read_template_file(filename)
@@ -41,6 +37,8 @@ module DockerComposeAutomation
 
     def run_assertions(ruby_version:, distro:)
       FILES.each do |file|
+        next if file == 'Dockerfile'
+
         test_file = read_test_file(file)
         template_file = read_template_file(file)
         assert_match test_file, template_file
@@ -53,12 +51,13 @@ module DockerComposeAutomation
       assert_equal dockerfile_ruby_version, ruby_version
 
       # Check if distro loaded properly
-      distro_regex = /FROM ruby:.*-?(?<distro>\w+)/
+      distro_regex = /#{ruby_regex}[- ](?<distro>\w+)\s+/
       distro_match = dockerfile.match(distro_regex)
       assert distro_match
 
       # Use the match group, if it doesnt exist, it means its debian based.
-      docker_distro = dockerfile.match[:distro] || :debian
+      docker_distro = dockerfile.match(distro_regex)[:distro]
+      docker_distro = :debian if docker_distro == 'as'
       assert_equal(distro, docker_distro)
     end
 
@@ -76,7 +75,7 @@ module DockerComposeAutomation
       distro_input = distros[distro].to_s
       ruby_version_input = ruby_versions[:"#{ruby_version}"].to_s
 
-      run_command('bridgetown apply ../bridgetown.automation.rb', distro_input, ruby_version_input)
+      run_command('bridgetown apply ../bridgetown.automation.rb', ruby_version_input, distro_input)
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end
