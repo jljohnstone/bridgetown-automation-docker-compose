@@ -75,7 +75,8 @@ module DockerComposeAutomation
       distro_input = distros[distro].to_s
       ruby_version_input = ruby_versions[:"#{ruby_version}"].to_s
 
-      run_command('bridgetown apply ../bridgetown.automation.rb', ruby_version_input, distro_input)
+      run_command('bridgetown apply ../bridgetown.automation.rb',
+                  ruby_version_input, distro_input)
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end

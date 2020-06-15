@@ -31,8 +31,8 @@ module DockerComposeAutomation
     end
 
     def ask_questions
-      ask_for_docker_ruby_version if @ruby_version.nil?
-      ask_for_distro if @distro.nil?
+      ask_for_docker_ruby_version if ruby_version.nil?
+      ask_for_distro if distro.nil?
     end
 
     private
