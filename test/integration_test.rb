@@ -74,25 +74,25 @@ module DockerComposeAutomation
       { ruby_version: ruby_version_input, distro: distro_input }
     end
 
-    # def test_it_works_with_local_automation
-    #   Rake.cd TEST_APP
+    def test_it_works_with_local_automation
+      Rake.cd TEST_APP
 
-    #   Rake.sh('bundle exec bridgetown new . --force ')
+      Rake.sh('bundle exec bridgetown new . --force ')
 
-    #   distro = :alpine
-    #   ruby_version = '2.6'
+      distro = :alpine
+      ruby_version = '2.6'
 
-    #   inputs = create_inputs(distro: distro, ruby_version: ruby_version)
+      inputs = create_inputs(distro: distro, ruby_version: ruby_version)
 
-    #   ruby_version_input = inputs[:ruby_version]
-    #   distro_input = inputs[:distro]
+      ruby_version_input = inputs[:ruby_version]
+      distro_input = inputs[:distro]
 
-    #   run_command(ruby_version_input, distro_input) do
-    #     'bridgetown apply ../bridgetown.automation.rb'
-    #   end
+      run_command(ruby_version_input, distro_input) do
+        'bridgetown apply ../bridgetown.automation.rb'
+      end
 
-    #   run_assertions(ruby_version: ruby_version, distro: distro)
-    # end
+      run_assertions(ruby_version: ruby_version, distro: distro)
+    end
 
     # Have to push to github first, and wait for github to update
     def test_it_works_with_remote_automation
