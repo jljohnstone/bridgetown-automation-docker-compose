@@ -108,3 +108,10 @@ If you have a `ruby-version` specified in your repo, make sure it aligns
 with the Ruby version pulled down by Docker. Check out
 [https://hub.docker.com/\_/ruby](https://hub.docker.com/_/ruby) for a
 list of officially supported ruby versions.
+
+Sometimes you may run into an issue with the binding of `node-sass`. To
+fix the issue simply run:
+
+```bash
+docker-compose run --rm web npm reinstall node-sass
+```
