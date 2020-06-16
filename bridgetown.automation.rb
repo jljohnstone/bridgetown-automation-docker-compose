@@ -57,7 +57,7 @@ end
 
 def copy_template_file(name)
   dest = name
-  src = File.join(ROOT_PATH, 'templates', "#{name}.tt")
+  src = File.join(@current_dir, 'templates', "#{name}.tt")
 
   template(src, dest)
 end
