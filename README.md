@@ -88,7 +88,7 @@ wait for Github to update the raw file so the remote automation test will pass
 ```bash
 git clone
 https://github.com/ParamagicDev/bridgetown-automation-docker-compose/
-cd bridgetown-automation-capybara
+cd bridgetown-automation-docker-compose
 bundle install
 bundle exec rake test
 ```
