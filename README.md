@@ -6,10 +6,18 @@
 
 - Ruby >= 2.5
 - Bridgetown ~> 0.15.0
+- Docker
+- Docker Compose
 
 ```bash
 bridgetown -v
 # => bridgetown 0.15.0.beta3 "Overlook"
+
+docker -v
+# Docker version 19.03.8, build afacb8b7f0
+
+docker-compose -v
+# docker-compose version 1.25.0, build unknown
 ```
 
 This project requires the new `apply` command introduced in Bridgetown
@@ -20,30 +28,47 @@ This project requires the new `apply` command introduced in Bridgetown
 ### New project
 
 ```bash
-bridgetown new <newsite> --apply="https://github.com/ParamagicDev/bridgetown-automation-capybara"
+bridgetown new <newsite> --apply="https://github.com/ParamagicDev/bridgetown-automation-docker-compose"
 ```
 
 ### Existing Project
 
 ```bash
-bridgetown apply https://github.com/ParamagicDev/bridgetown-automation-capybara
+bridgetown apply https://github.com/ParamagicDev/bridgetown-automation-docker-compose
 ```
 
-## Adding tests to a Bridgetown project
+## Getting Started
 
-Tests are located in the `capybara/integration` file. Checkout [Cypress](capybara.io)
-for further documentation on adding Cypress tests.
+### Linux
 
-## Reference Repository
+Prior to running `docker-compose up --build` or `docker-compose build`
+make sure to `source` the `docker.env` file to prevent permissions
+issues.
 
-A new project which applies this `automation` will look like the following repository:
+`source ./docker.env && docker-compose up --build`
 
-[https://github.com/ParamagicDev/bridgetown-example-capybara](https://github.com/ParamagicDev/bridgetown-example-capybara)
+### Mac & Windows
+
+Mac and Windows users should have no issues running just `docker-compose up --build` or `docker-compose build` due to how those OS's run Docker.
+
+```bash
+docker-compose up --build
+
+# OR
+
+docker-compose build
+docker-compose up
+```
+
+### Viewing the website
+
+After running `docker-compose up --build` or `docker-compose up` you
+should see the site up and running on `localhost:4000`
 
 ## Testing the "apply" command
 
 Right now there is one big integration test which simply
-checks that the files were created for Cypress in a new bridgetown project.
+checks that the files were created for Docker in a new bridgetown project.
 
 In order for the tests to pass, you must first push the branch you're working on and then
 wait for Github to update the raw file so the remote automation test will pass
