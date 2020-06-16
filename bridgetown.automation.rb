@@ -19,8 +19,8 @@ DIR_NAME = 'bridgetown-automation-docker-compose'
 
 GITHUB_PATH = "https://github.com/ParamagicDev/#{DIR_NAME}.git"
 
-def determine_template_dir(current_dir = @current_dir)
-  File.join(current_dir, 'templates')
+def determine_template_dir
+  File.join(@current_dir, 'templates')
 end
 
 def require_libs
