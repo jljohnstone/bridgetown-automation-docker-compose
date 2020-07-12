@@ -5,10 +5,9 @@ RUN apk add --no-cache --virtual \
    nodejs-dev yarn bash \
    tzdata build-base libffi-dev \
    curl git vim \
-   libnotify-dev
-
-RUN gem install bridgetown
-RUN gem install bundler
+   libnotify-dev \
+   # needed for testing
+   docker docker-compose
 
 FROM builder as bridgetownrb-app
 
@@ -34,6 +33,7 @@ WORKDIR $APP_DIR
 
 # COPY is run as a root user, not as the USER defined above, so we must chown it
 COPY --chown=$USER_ID:$GROUP_ID Gemfile* $APP_DIR/
+RUN gem install bundler
 RUN bundle install
 
 CMD ["bundle", "exec", "rake", "test"]
