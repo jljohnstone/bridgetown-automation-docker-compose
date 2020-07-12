@@ -1,3 +1,5 @@
+![build](https://github.com/ParamagicDev/bridgetown-automation-docker-compose/workflows/build/badge.svg)
+
 # Purpose
 
 To provide an easy way for users to add Docker to their project.
