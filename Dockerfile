@@ -7,6 +7,9 @@ RUN apk add --no-cache --virtual \
    curl git vim \
    libnotify-dev
 
+RUN gem install bridgetown
+RUN gem install bundler
+
 FROM builder as bridgetownrb-app
 
 # This is to fix an issue on Linux with permissions issues
@@ -31,7 +34,6 @@ WORKDIR $APP_DIR
 
 # COPY is run as a root user, not as the USER defined above, so we must chown it
 COPY --chown=$USER_ID:$GROUP_ID Gemfile* $APP_DIR/
-RUN gem install bundler
 RUN bundle install
 
 CMD ["bundle", "exec", "rake", "test"]

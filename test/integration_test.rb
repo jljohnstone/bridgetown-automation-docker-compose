@@ -74,10 +74,27 @@ module DockerComposeAutomation
       { ruby_version: ruby_version_input, distro: distro_input }
     end
 
+    def pull_dockerfiles
+      Rake.sh(%(/bin/bash -c "$(curl -fsSl #{full_url})"))
+    end
+
+    def docker_run
+      "docker run -it bridgetown-automation-docker:latest"
+    end
+
+    def full_url
+      github_url = "https://raw.githubusercontent.com/"
+      repo_path = "ParamagicDev/#{GITHUB_REPO_NAME}/"
+      installer_path = "#{BRANCH}/installer.sh"
+      github_url + repo_path + installer_path
+    end
+
     def test_it_works_with_local_automation
       Rake.cd TEST_APP
 
-      Rake.sh('bundle exec bridgetown new . --force ')
+      pull_dockerfiles
+      Rake.sh("#{docker_run} bridgetown new . --force ")
+
 
       distro = :alpine
       ruby_version = '2.6'
@@ -88,7 +105,7 @@ module DockerComposeAutomation
       distro_input = inputs[:distro]
 
       run_command(ruby_version_input, distro_input) do
-        'bridgetown apply ../bridgetown.automation.rb'
+        "#{docker_run} bridgetown apply ../bridgetown.automation.rb"
       end
 
       run_assertions(ruby_version: ruby_version, distro: distro)
@@ -113,10 +130,11 @@ module DockerComposeAutomation
       ruby_version_input = inputs[:ruby_version]
       distro_input = inputs[:distro]
 
-      Rake.sh('bundle exec bridgetown new . --force ')
+      pull_dockerfiles
+      Rake.sh("#{docker_run} bridgetown new . --force ")
 
       run_command(ruby_version_input, distro_input) do
-        "bridgetown apply #{url}"
+        "#{docker_run} bridgetown apply #{url}"
       end
 
       run_assertions(ruby_version: ruby_version, distro: distro)

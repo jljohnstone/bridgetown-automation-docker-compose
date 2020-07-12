@@ -6,15 +6,11 @@ To provide an easy way for users to add Docker to their project.
 
 ## Prerequisites
 
-- Ruby >= 2.5
-- Bridgetown ~> 0.15.0
 - Docker
 - Docker Compose
+- Git
 
 ```bash
-bridgetown -v
-# => bridgetown 0.15.0.beta3 "Overlook"
-
 docker -v
 # Docker version 19.03.8, build afacb8b7f0
 
@@ -23,20 +19,23 @@ docker-compose -v
 ```
 
 This project requires the new `apply` command introduced in Bridgetown
-`0.15.0`
+`0.15.0` so make sure if adding to an existing project you are aware of
+this.
 
 ## Usage
 
 ### New project
 
 ```bash
-bridgetown new <newsite> --apply="https://github.com/ParamagicDev/bridgetown-automation-docker-compose"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ParamagicDev/bridgetown-automation-docker-compose/master/installer.sh)"
+docker run -it bridgetown-automation-docker:latest bridgetown new <newsite> --apply="https://github.com/ParamagicDev/bridgetown-automation-docker-compose"
 ```
 
 ### Existing Project
 
 ```bash
-[bundle exec] bridgetown apply https://github.com/ParamagicDev/bridgetown-automation-docker-compose
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ParamagicDev/bridgetown-automation-docker-compose/master/installer.sh)"
+docker run -it bridgetown-automation-docker:latest bundle exec bridgetown apply https://github.com/ParamagicDev/bridgetown-automation-docker-compose
 ```
 
 ## Getting Started
