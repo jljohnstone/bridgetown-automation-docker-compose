@@ -1,4 +1,4 @@
-FROM ruby:<%= @docker_ruby_version %>-alpine as builder
+FROM ruby:<%= @ruby_version %>-alpine as builder
 
 RUN apk add --no-cache --virtual \
     # required

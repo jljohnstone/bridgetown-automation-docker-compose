@@ -19,8 +19,8 @@ DIR_NAME = 'bridgetown-automation-docker-compose'
 
 GITHUB_PATH = "https://github.com/ParamagicDev/#{DIR_NAME}.git"
 
-def determine_template_dir(current_dir = @current_dir)
-  File.join(current_dir, 'templates')
+def determine_template_dir
+  File.join(@current_dir, 'templates')
 end
 
 def require_libs
@@ -57,37 +57,14 @@ end
 
 def copy_template_file(name)
   dest = name
-  src = File.join(ROOT_PATH, 'templates', "#{name}.tt")
+  src = File.join(@current_dir, 'templates', "#{name}.tt")
 
   template(src, dest)
 end
 
-def copy_docker_compose
-  copy_template_file('docker-compose.yml')
-end
-
-def copy_dockerfile
-  copy_template_file('Dockerfile')
-end
-
-def copy_dockerignore
-  copy_template_file('.dockerignore')
-end
-
-def copy_docker_env
-  copy_template_file('docker.env')
-end
-
-def copy_compose_sh
-  copy_template_file('compose.sh')
-end
-
-def copy_files
-  copy_docker_compose
-  copy_dockerfile
-  copy_dockerignore
-  copy_docker_env
-  copy_compose_sh
+def copy_template_files
+  files = DockerComposeAutomation::FILES
+  files.each { |file| copy_template_file(file) }
 end
 
 add_template_repository_to_source_path
@@ -101,6 +78,10 @@ require_libs
 @distro = @config.distro
 @ruby_version = @config.ruby_version
 
-copy_files
+copy_template_files
 
-say 'Successfully copied a docker files into your repo!', :green
+say "\nSuccessfully added files for Docker to your repo!", :green
+say "\nIf you're on Linux, to prevent permission issues, make sure to run:", :magenta
+say '`source ./docker.env && docker-compose up --build`', :red
+say "\nOn Mac & Windows, feel free to just run:", :magenta
+say '`docker-compose up --build`', :red

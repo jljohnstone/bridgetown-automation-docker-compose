@@ -5,3 +5,5 @@ gem 'minitest'
 gem 'rake'
 gem 'rubocop'
 gem 'thor'
+
+gem "minitest-reporters", "~> 1.4"
