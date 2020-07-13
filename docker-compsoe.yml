@@ -13,11 +13,5 @@ services:
 
     command: bash -c "bundle exec rake test"
 
-    ports:
-      - '4000:4000'
-      # Not totally necessary to open 4001, but it is used, so lets make it discoverable
-      - '4001:4001'
-      - '4002:4002'
-
     volumes:
       - .:${APP_DIR:-/home/user/bridgetown-app}
