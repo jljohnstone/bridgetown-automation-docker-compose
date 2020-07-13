@@ -16,8 +16,8 @@ repo_name="bridgetown-automation-docker-compose"
 repo_url="https://github.com/ParamagicDev/$repo_name.git"
 
 # Pull down files related to docker.
-git clone "$repo_url" "$tmp_dir" --quiet
-([ -z "$1" ] && branch="$1") || branch="master"
+git clone "$repo_url" "$tmp_dir"
+branch="${1:-master}"
 
 cd "$tmp_dir" && git checkout "$branch" && cd -
 
@@ -29,21 +29,20 @@ docker_tag="bridgetown-automation-docker:latest"
 
 printf "Building your docker image...\n\n"
 source "$tmp_dir/docker.env"
-docker build -t $docker_tag \
-             -f "$tmp_dir/Dockerfile" \
-             --target builder \
-             "$tmp_dir"
+docker build  -t $docker_tag \
+              -f $tmp_dir/Dockerfile \
+              --target builder \
+              "$tmp_dir"
 
 # Clean up
 rm -rf "$tmp_dir"
 
 printf "Successfully built your image for Bridgetown.\n\n"
 
-printf "What is the directory of your bridgetown project?\n"
-[ -z "$DESTINATION" ] || read DESTINATION
+[ -z "$DESTINATION" ] && printf "What is the directory of your bridgetown project?\n" && read DESTINATION
 
 while true; do
-  [ -z "$PROJECT_TYPE" ] && break
+  [ -z "$PROJECT_TYPE" ] || break
   printf "Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]\n"
   read PROJECT_TYPE
 
@@ -60,11 +59,11 @@ done
 
 if [ "$PROJECT_TYPE" == "new" ]; then
   docker run --rm -it "$docker_tag" gem install bridgetown
-  docker run --rm -it "$docker_tag" bridgetown new "$DESTINATION" \
+  docker run --rm -it "$docker_tag" bridgetown new $DESTINATION \
              --apply="$repo_url"
 elif [ "$PROJECT_TYPE" == "existing" ]; then
   cd "$DESTINATION" || (echo "Unable to locate directory." && exit 1)
-  docker run --rm -it "$docker_tag" bundle exec bridgetown apply "$repo_url"
+  docker run --rm -it "$docker_tag" "bundle exec bridgetown apply $repo_url"
 fi
 
 printf "Successfully added Docker to your bridgetown project\n"
