@@ -5,8 +5,8 @@ set -u
 printf "Installing Bridgetown via Docker...\n"
 
 # Check if docker exists
-docker -v || echo "Docker executable not found" && exit 1
-docker-compose -v || echo "Docker Compose executable not found" && exit 1
+command -v docker -v || echo "Docker executable not found" && exit 1
+command -v "docker-compose -v" || echo "Docker Compose executable not found" && exit 1
 git --version || echo "git executable not found" && exit 1
 
 # Pull down Dockerfile to a tempdir
