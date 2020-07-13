@@ -58,9 +58,9 @@ while true; do
 done
 
 if [ "$PROJECT_TYPE" == "new" ]; then
-  docker run --rm -it "$docker_tag" gem install bridgetown && \
-    bridgetown new "$DESTINATION" \
-              --apply="$repo_url"
+  docker run --rm -it "$docker_tag" gem install bridgetown &&
+             bridgetown new "$DESTINATION" \
+                        --apply="$repo_url"
 elif [ "$PROJECT_TYPE" == "existing" ]; then
   cd "$DESTINATION" || (echo "Unable to locate directory." && exit 1)
   docker run --rm -it "$docker_tag" "bundle exec bridgetown apply $repo_url"
