@@ -18,15 +18,15 @@ repo_url="https://github.com/ParamagicDev/$repo_name.git"
 # Pull down files related to docker.
 git clone "$repo_url" "$tmp_dir" --quiet
 branch="$1"
-cd "$tmp_dir" && git checkout "$branch" && cd -
 
+([ -z "$1" ] && branch="$1") || branch="master"
+
+cd "$tmp_dir" && git checkout "$branch" && cd -
 
 # turn case sensitive matching back on
 shopt -u nocasematch
 
-
 source "$tmp_dir/docker.env"
-
 docker_tag="bridgetown-automation-docker:latest"
 
 printf "Building your docker image...\n\n"
@@ -42,9 +42,10 @@ rm -rf "$tmp_dir"
 printf "Successfully built your image for Bridgetown.\n\n"
 
 printf "What is the directory of your bridgetown project?\n"
-read destination
+[ -z "$destination" ] || read destination
 
 while true; do
+  [ -z "$project_type" ] && break
   printf "Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]\n"
   read project_type
 
