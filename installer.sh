@@ -32,8 +32,7 @@ docker build -t $docker_tag \
 # Clean up
 rm -rf "$tmp_dir"
 
-printf "Successfully built your image for Bridgetown.\n"
-
+printf "Successfully built your image for Bridgetown.\n\n"
 
 while true; do
   printf "Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]\n"
@@ -55,21 +54,18 @@ shopt -u nocasematch
 
 echo "$project_type"
 
-printf "What is the directory of your bridgetown project?"
+printf "What is the directory of your bridgetown project?\n"
 read destination
 
 if [ "$project_type" == "new" ]; then
-  docker run -it "$docker_tag" bridgetown new "$destination" \
-                --apply="$repo_url"
+  docker run --rm -it "$docker_tag" gem install bridgetown
+  docker run --rm -it "$docker_tag" bridgetown new "$destination" \
+             --apply="$repo_url"
 elif [ "$project_type" == "existing" ]; then
   cd "$destination" || (echo "Unable to locate directory." && exit 1)
-  docker run -it "$docker_tag" bundle exec bridgetown apply "$repo_url"
+  docker run --rm -it "$docker_tag" bundle exec bridgetown apply "$repo_url"
 fi
 
-
-# printf "To add Docker to your Bridgetown project run one of the following:\n\n"
-# printf "\nFor a new project run:\n"
-# printf "\ndocker run -it %s bridgetown new <newsite> --apply=\"%s\"" "$docker_tag" "$repo_url"
-# printf "\n\n"
-# printf "\nFor an existing project run:\n\n"
-# printf "docker run -it %s [bundle exec] bridgetown apply %s" "$docker_tag" "$repo_url"
+printf "Successfully added Docker to your bridgetown project\n"
+printf "To use docker in your new project simply do the following:\n\n"
+printf "cd $destination && source docker.env && docker-compose up --build"

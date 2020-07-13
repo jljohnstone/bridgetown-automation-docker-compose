@@ -16,6 +16,9 @@ docker -v
 
 docker-compose -v
 # docker-compose version 1.25.0, build unknown
+
+git --version
+# git version 2.25.1
 ```
 
 This project requires the new `apply` command introduced in Bridgetown
@@ -24,19 +27,13 @@ this.
 
 ## Usage
 
-### New project
-
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ParamagicDev/bridgetown-automation-docker-compose/master/installer.sh)"
-docker run -it bridgetown-automation-docker:latest bridgetown new <newsite> --apply="https://github.com/ParamagicDev/bridgetown-automation-docker-compose"
 ```
 
-### Existing Project
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ParamagicDev/bridgetown-automation-docker-compose/master/installer.sh)"
-docker run -it bridgetown-automation-docker:latest bundle exec bridgetown apply https://github.com/ParamagicDev/bridgetown-automation-docker-compose
-```
+You will then be prompted for whether to create a new project or add to
+an existing one. It will also prompt for where the project is in your
+filesystem.
 
 ## Getting Started
 
