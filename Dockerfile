@@ -9,6 +9,8 @@ RUN apk add --no-cache --virtual \
    # needed for testing
    docker docker-compose
 
+RUN gem install bridgetown
+
 FROM builder as bridgetownrb-app
 
 # This is to fix an issue on Linux with permissions issues

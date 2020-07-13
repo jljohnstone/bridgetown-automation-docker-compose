@@ -26,15 +26,11 @@ module DockerComposeAutomation
       cmd = yield if block_given? || inputs.shift!
 
       Open3.popen3(cmd) do |stdin, stdout, _stderr, wait_thr|
-        wait_thr.pid
-
         inputs.flatten.each { |input| stdin.puts(input) }
 
         stdout.each_line do |line|
           puts line
         end
-
-        exit_status = wait_thr.value
       end
     end
 
@@ -75,11 +71,17 @@ module DockerComposeAutomation
     end
 
     def pull_dockerfiles
-      Rake.sh(%(/bin/bash -c "$(curl -fsSl #{full_url})"))
+      run_command("new", ".") do
+        Rake.sh %(/bin/bash -c "$(curl -fsSl #{full_url}) #{BRANCH}")
+      end
+    end
+
+    def docker_tag
+      "bridgetown-automation-docker:latest"
     end
 
     def docker_run
-      "docker run -it bridgetown-automation-docker:latest"
+      "docker run --rm -it #{docker_tag}"
     end
 
     def full_url
@@ -93,8 +95,6 @@ module DockerComposeAutomation
       Rake.cd TEST_APP
 
       pull_dockerfiles
-      Rake.sh("#{docker_run} bridgetown new . --force ")
-
 
       distro = :alpine
       ruby_version = '2.6'
@@ -131,7 +131,6 @@ module DockerComposeAutomation
       distro_input = inputs[:distro]
 
       pull_dockerfiles
-      Rake.sh("#{docker_run} bridgetown new . --force ")
 
       run_command(ruby_version_input, distro_input) do
         "#{docker_run} bridgetown apply #{url}"

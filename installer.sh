@@ -17,6 +17,13 @@ repo_url="https://github.com/ParamagicDev/$repo_name.git"
 
 # Pull down files related to docker.
 git clone "$repo_url" "$tmp_dir" --quiet
+branch="$1"
+cd "$tmp_dir" && git checkout "$branch" && cd -
+
+
+# turn case sensitive matching back on
+shopt -u nocasematch
+
 
 source "$tmp_dir/docker.env"
 
@@ -27,12 +34,15 @@ source "$tmp_dir/docker.env"
 docker build -t $docker_tag \
              -f "$tmp_dir/Dockerfile" \
              --target builder \
-             .
+             "$tmp_dir"
 
 # Clean up
 rm -rf "$tmp_dir"
 
 printf "Successfully built your image for Bridgetown.\n\n"
+
+printf "What is the directory of your bridgetown project?\n"
+read destination
 
 while true; do
   printf "Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]\n"
@@ -48,14 +58,6 @@ while true; do
     break
   fi
 done
-
-# turn case sensitive matching back on
-shopt -u nocasematch
-
-echo "$project_type"
-
-printf "What is the directory of your bridgetown project?\n"
-read destination
 
 if [ "$project_type" == "new" ]; then
   docker run --rm -it "$docker_tag" gem install bridgetown
