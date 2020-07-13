@@ -1,13 +1,13 @@
 #!/bin/bash
 
-set -u
+set -eu
 
 printf "Installing Bridgetown via Docker...\n"
 
 # Check if docker exists
-command -v docker -v || echo "Docker executable not found" && exit 1
-command -v "docker-compose -v" || echo "Docker Compose executable not found" && exit 1
-git --version || echo "git executable not found" && exit 1
+command -v docker || (echo "Docker executable not found" && exit 1)
+command -v docker-compose || (echo "Docker Compose executable not found" && exit 1)
+command -v git || (echo "git executable not found" && exit 1)
 
 # Pull down Dockerfile to a tempdir
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
@@ -22,20 +22,54 @@ source "$tmp_dir/docker.env"
 
 docker_tag="bridgetown-automation-docker:latest"
 
-printf "Building your docker image\n\n"
-docker build -t "$docker_tag" \
+printf "Building your docker image...\n\n"
+source "$tmp_dir/docker.env"
+docker build -t $docker_tag \
              -f "$tmp_dir/Dockerfile" \
              --target builder \
-             --build-arg USER_ID GROUP_ID DOCKER_USER APP_DIR
+             .
 
 # Clean up
 rm -rf "$tmp_dir"
 
 printf "Successfully built your image for Bridgetown.\n"
-printf "To add Docker to your Bridgetown project run the following:\n"
-printf "\nFor a new project run:"
-printf "\ndocker run -it %s bridgetown new <newsite> --apply=\"%s\"" "$docker_tag" "$repo_url"
-printf "\n\n"
-printf "\nFor an existing project run:"
-printf "docker run -it %s [bundle exec] bridgetown apply %s" "$docker_tag" "$repo_url"
-printf "\n"
+
+
+while true; do
+  printf "Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]\n"
+  read project_type
+
+  # make case matching insensitive
+  shopt -s nocasematch
+  if [ "$project_type" == "existing" ] || [ "$project_type" == "e" ]; then
+    project_type="existing"
+    break
+  elif [ "$project_type" == "new" ] || [ "$project_type" == "n" ]; then
+    project_type="new"
+    break
+  fi
+done
+
+# turn case sensitive matching back on
+shopt -u nocasematch
+
+echo "$project_type"
+
+printf "What is the directory of your bridgetown project?"
+read destination
+
+if [ "$project_type" == "new" ]; then
+  docker run -it "$docker_tag" bridgetown new "$destination" \
+                --apply="$repo_url"
+elif [ "$project_type" == "existing" ]; then
+  cd "$destination" || (echo "Unable to locate directory." && exit 1)
+  docker run -it "$docker_tag" bundle exec bridgetown apply "$repo_url"
+fi
+
+
+# printf "To add Docker to your Bridgetown project run one of the following:\n\n"
+# printf "\nFor a new project run:\n"
+# printf "\ndocker run -it %s bridgetown new <newsite> --apply=\"%s\"" "$docker_tag" "$repo_url"
+# printf "\n\n"
+# printf "\nFor an existing project run:\n\n"
+# printf "docker run -it %s [bundle exec] bridgetown apply %s" "$docker_tag" "$repo_url"
