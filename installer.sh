@@ -31,6 +31,10 @@ printf "Building your docker image...\n\n"
 source "$tmp_dir/docker.env"
 docker build  -t $docker_tag \
               -f $tmp_dir/Dockerfile \
+              --build-arg DOCKER_USER \
+              --build-arg USER_ID \
+              --build-arg GROUP_ID \
+              --build-arg APP_DIR \
               "$tmp_dir"
 
 # Clean up
@@ -58,23 +62,31 @@ while true; do
 done
 
 if [ "$PROJECT_TYPE" = "new" ]; then
-  mkdir -p "$DESTINATION"
-  cd "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
-  # docker create -it --name bridgetown-docker "$docker_tag" bash -c "\
-  #   gem install bridgetown && \
-  #   bridgetown new . --apply=\"$repo_url\"
-  #   rm -rf node_modules
-  # "
-  # docker cp bridgetown-docker:"$(pwd)" "$(pwd)"
+  mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
 
-  docker run --rm -v "$(pwd):$APP_DIR" -u $(id -u $USER):$(id -g $USER) -it "$docker_tag" bash -c "\
-    bridgetown new . --apply=\"$repo_url\"
+  # docker run -v $(pwd):$APP_DIR-u $(id -u $USER):$(id -g $USER) --name bridgetown-docker -it "$docker_tag" bash -c "\
+  #   bundle exec bridgetown new $DESTINATION --apply=$repo_url --force
+  #   cp -a $DESTINATION $APP_DIR
+  # "
+  docker rm -f bridgetown-docker || echo ""
+  docker run -u $(id -u $USER):$(id -g $USER) --name bridgetown-docker -it "$docker_tag" bash -c "\
+    bundle exec bridgetown new . --apply=\"$repo_url\" --force
+    echo \"
+
+    Performing clean up operations...\"
+    rm -rf node_modules
   "
+  docker cp bridgetown-docker:"$APP_DIR" "$DESTINATION"
+  cp -R $DESTINATION/bridgetown/* $DESTINATION/bridgetown/.* $DESTINATION
+  rm -rf $DESTINATION/bridgetown
+  docker rm -f bridgetown-docker || echo ""
 
 elif [ "$PROJECT_TYPE" = "existing" ]; then
   cd "$DESTINATION" || (echo "Unable to locate directory." && exit 1)
   docker run --rm -v "$(pwd):$APP_DIR" -it "$docker_tag" "bundle exec bridgetown apply $repo_url"
 fi
+
+
 
 printf "Successfully added Docker to your bridgetown project\n"
 printf "To use docker in your new project simply do the following:\n\n"
