@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 printf "Installing Bridgetown via Docker...\n"
 
@@ -31,7 +31,6 @@ printf "Building your docker image...\n\n"
 source "$tmp_dir/docker.env"
 docker build  -t $docker_tag \
               -f $tmp_dir/Dockerfile \
-              --target builder \
               "$tmp_dir"
 
 # Clean up
@@ -42,8 +41,8 @@ printf "Successfully built your image for Bridgetown.\n\n"
 [ -z "$DESTINATION" ] && printf "What is the directory of your bridgetown project?\n" && read DESTINATION
 
 while true; do
-  [ "$PROJECT_TYPE" = "existing" ] || break
-  [ "$PROJECT_TYPE" = "new" ] || break
+  [ "$PROJECT_TYPE" = "existing" ] && break
+  [ "$PROJECT_TYPE" = "new" ] && break
   printf "Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]\n"
   read PROJECT_TYPE
 
@@ -59,11 +58,22 @@ while true; do
 done
 
 if [ "$PROJECT_TYPE" = "new" ]; then
-  docker run --rm -v ".:$APP_DIR" -it "$docker_tag" bash -c "gem install bridgetown && \
-             bridgetown new $DESTINATION --apply=$repo_url"
+  mkdir -p "$DESTINATION"
+  cd "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
+  # docker create -it --name bridgetown-docker "$docker_tag" bash -c "\
+  #   gem install bridgetown && \
+  #   bridgetown new . --apply=\"$repo_url\"
+  #   rm -rf node_modules
+  # "
+  # docker cp bridgetown-docker:"$(pwd)" "$(pwd)"
+
+  docker run --rm -v "$(pwd):$APP_DIR" -u $(id -u $USER):$(id -g $USER) -it "$docker_tag" bash -c "\
+    bridgetown new . --apply=\"$repo_url\"
+  "
+
 elif [ "$PROJECT_TYPE" = "existing" ]; then
   cd "$DESTINATION" || (echo "Unable to locate directory." && exit 1)
-  docker run --rm -v ".:$APP_DIR" -it "$docker_tag" "bundle exec bridgetown apply $repo_url"
+  docker run --rm -v "$(pwd):$APP_DIR" -it "$docker_tag" "bundle exec bridgetown apply $repo_url"
 fi
 
 printf "Successfully added Docker to your bridgetown project\n"

@@ -9,8 +9,6 @@ RUN apk add --no-cache --virtual \
    # needed for testing
    docker docker-compose
 
-RUN gem install bridgetown
-
 FROM builder as bridgetownrb-app
 
 # This is to fix an issue on Linux with permissions issues
@@ -32,10 +30,10 @@ USER $USER_ID:$GROUP_ID
 
 # . now == $APP_DIR
 WORKDIR $APP_DIR
+RUN gem install bundler
 
 # COPY is run as a root user, not as the USER defined above, so we must chown it
 COPY --chown=$USER_ID:$GROUP_ID Gemfile* $APP_DIR/
-RUN gem install bundler
 RUN bundle install
 
 CMD ["bundle", "exec", "rake", "test"]
