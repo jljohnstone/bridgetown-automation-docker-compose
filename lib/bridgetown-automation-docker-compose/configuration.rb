@@ -40,7 +40,7 @@ module DockerComposeAutomation
     def ask_for_input(question, answers, env_var = nil)
       allowable_answers = answers.keys
 
-      return env_var.to_i if allowable_answers.include?(env_var)
+      return env_var.to_i if allowable_answers.include?(env_var.to_i)
 
       provide_input = "Please provide a number (1-#{answers.length})"
 
