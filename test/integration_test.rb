@@ -65,7 +65,7 @@ module DockerComposeAutomation
       %(/bin/bash -c "#{path_to_installer} #{BRANCH}")
     end
 
-    def remote_install(full_url)
+    def remote_install
       %(/bin/bash -c "$(curl -fsSl #{full_url}) #{BRANCH}")
     end
 
@@ -106,9 +106,7 @@ module DockerComposeAutomation
 
       Rake.sh("bundle exec bridgetown new #{TEST_APP} --force")
 
-      run_command(ruby_version_input, distro_input) do
-        Rake.sh(remote_install(full_url))
-      end
+      Rake.sh("DOCKER_DISTRO=#{distro_input} DOCKER_RUBY_VERSION=#{ruby_version_input} #{remote_install}")
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end
