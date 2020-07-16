@@ -98,7 +98,7 @@ build_docker_image() {
 docker_run() {
   docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
              -v "$(realpath $DESTINATION)":"$APP_DIR" \
-             -u $(id -u $USER):$(id -g $USER) -it "$docker_tag" \
+             -u $USER_ID:$GROUP_ID -it "$docker_tag" \
              bash -c "$1"
 }
 
