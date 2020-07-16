@@ -2,6 +2,14 @@
 
 set -e
 
+tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
+repo_name="bridgetown-automation-docker-compose"
+repo_url="https://github.com/ParamagicDev/$repo_name"
+branch="${1:-master}"
+docker_tag="bridgetown-automation-docker:latest"
+PROJECT_TYPE=$PROJECT_TYPE
+DESTINATION=$DESTINATION
+
 main() {
   printf "Installing Bridgetown via Docker...\n"
   check_dependencies
@@ -22,11 +30,6 @@ check_dependencies() {
 
 # Pull down Dockerfile to a tempdir
 clone_repo() {
-  tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
-  repo_name="bridgetown-automation-docker-compose"
-  repo_url="https://github.com/ParamagicDev/$repo_name"
-  branch="${1:-master}"
-
   git clone "$repo_url" "$tmp_dir"
   cd "$tmp_dir" && git checkout "$branch" && cd -
 }
@@ -69,7 +72,6 @@ copy_gemfile() {
 build_docker_image() {
   # env vars
   source "$tmp_dir/docker.env"
-  docker_tag="bridgetown-automation-docker:latest"
 
   mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
   copy_gemfile
