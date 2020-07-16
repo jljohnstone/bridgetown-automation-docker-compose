@@ -69,57 +69,21 @@ module DockerComposeAutomation
       %(/bin/bash -c "$(curl -fsSl #{full_url})" #{BRANCH})
     end
 
-    def simulate_input(cmd, *inputs)
-      file = Tempfile.new('expect_file.exp')
-
-      file.write('#!/usr/bin/expect -f')
-      file.write("\n")
-      file.write("spawn #{cmd}")
-
-      inputs.flatten.each do |input|
-        file.write("expect #{input[:expect]}")
-        file.write("send #{input[:send]}")
-      end
-
-      file.write('interact')
-      file.close
-      Rake.sh("expect -f #{file.path}")
-      file.unlink
-    end
-
-    def input_ary(ruby_version_input, distro_input)
-      [
-        {
-          expect: 'What is the directory of your bridgetown project?',
-          send: TEST_APP
-        },
-        {
-          expect: 'Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]',
-          send: 'new'
-        },
-        {
-          expect: '  ',
-          send: ruby_version_input
-        },
-        {
-          expect: '  ',
-          send: distro_input
-        }
-      ]
-    end
-
     def test_it_works_with_local_automation
       Rake.cd TEST_APP
 
       distro = :alpine
       ruby_version = '2.6'
 
-    #   distro = :alpine
-    #   ruby_version = '2.6'
+      inputs = create_inputs(distro: distro, ruby_version: ruby_version)
 
-    #   inputs = create_inputs(distro: distro, ruby_version: ruby_version)
+      ruby_version_input = inputs[:ruby_version]
+      distro_input = inputs[:distro]
 
-      simulate_input(local_install, inputs_ary(ruby_version_input, distro_input))
+      ENV["PROJECT_TYPE"] = "new"
+      ENV["DOCKER_RUBY_VERSION"] = ruby_version_input
+      ENV["DOCKER_DISTRO"] = distro_input
+      Rake.sh("DOCKER_DISTRO=#{distro_input} DOCKER_RUBY_VERSION=#{ruby_version_input} #{local_install}")
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end

@@ -72,7 +72,7 @@ module DockerComposeAutomation
       answers = distros
 
       env_var = ENV['DOCKER_DISTRO']
-      input = ask_for_input(question, answers)
+      input = ask_for_input(question, answers, env_var)
 
       @distro = answers[input]
     end

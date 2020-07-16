@@ -9,6 +9,8 @@ branch="${1:-master}"
 docker_tag="bridgetown-automation-docker:latest"
 PROJECT_TYPE=$PROJECT_TYPE
 DESTINATION=$DESTINATION
+DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION
+DOCKER_DISTRO=$DOCKER_DISTRO
 
 main() {
   printf "Installing Bridgetown via Docker...\n"
@@ -56,6 +58,8 @@ ask_for_project_type() {
       break
     elif [ "$PROJECT_TYPE" = "new" ] || [ "$PROJECT_TYPE" = "n" ]; then
       PROJECT_TYPE="new"
+
+      [ "$(ls -A $DESTINATION)" ] && echo "Directory not empty. Aborting..." && exit 1
       break
     fi
   done
@@ -99,9 +103,11 @@ docker_run() {
 
 run_docker_container() {
   if [ "$PROJECT_TYPE" = "new" ]; then
-    docker_run "bundle exec bridgetown new . --apply=\"$repo_url\" --force"
+    docker_run "DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO \
+                bundle exec bridgetown new . --apply=\"$repo_url\" --force"
   elif [ "$PROJECT_TYPE" = "existing" ]; then
-    docker_run "bundle exec bridgetown apply $repo_url"
+    docker_run "DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO \
+                bundle exec bridgetown apply $repo_url"
   fi
 }
 
