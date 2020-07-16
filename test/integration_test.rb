@@ -10,22 +10,15 @@ module DockerComposeAutomation
   class IntegrationTest < Minitest::Test
     def setup
       Rake.rm_rf(TEST_APP)
+      ENV['DOCKER_DESTINATION'] = TEST_APP
       Rake.mkdir_p(TEST_APP)
-    end
-
-    def read_test_file(filename)
-      File.read(File.join(TEST_APP, filename))
-    end
-
-    def read_template_file(filename)
-      File.read(File.join(TEMPLATES_DIR, "#{filename}.tt"))
     end
 
     # If no block given, use the first input as the command
     def run_command(*inputs)
       cmd = yield if block_given? || inputs.shift!
 
-      Open3.popen3(cmd) do |stdin, stdout, _stderr, wait_thr|
+      Open3.popen3(cmd) do |stdin, stdout, _stderr, _wait_thr|
         inputs.flatten.each { |input| stdin.puts(input) }
 
         stdout.each_line do |line|
@@ -70,25 +63,19 @@ module DockerComposeAutomation
       { ruby_version: ruby_version_input, distro: distro_input }
     end
 
-    def pull_dockerfiles
-      run_command("new", ".") do
-        Rake.sh %(/bin/bash -c "$(curl -fsSl #{full_url}) #{BRANCH}")
-      end
-    end
-
-    def docker_tag
-      "bridgetown-automation-docker:latest"
-    end
-
-    def docker_run
-      "docker run --rm -it #{docker_tag}"
-    end
-
     def full_url
-      github_url = "https://raw.githubusercontent.com/"
+      github_url = 'https://raw.githubusercontent.com/'
       repo_path = "ParamagicDev/#{GITHUB_REPO_NAME}/"
       installer_path = "#{BRANCH}/installer.sh"
       github_url + repo_path + installer_path
+    end
+
+    def local_install
+      Rake.sh %("/bin/bash -c "#{installer} #{BRANCH}")
+    end
+
+    def remote_install(full_url)
+      %(/bin/bash -c "$(curl -fsSl #{full_url}) #{BRANCH}")
     end
 
     def test_it_works_with_local_automation
@@ -104,8 +91,11 @@ module DockerComposeAutomation
       ruby_version_input = inputs[:ruby_version]
       distro_input = inputs[:distro]
 
+      ENV['PROJECT_TYPE'] = 'existing'
+      Rake.sh %("/bin/bash -c "#{installer} #{BRANCH}")
+
       run_command(ruby_version_input, distro_input) do
-        "#{docker_run} bridgetown apply ../bridgetown.automation.rb"
+        Rake.sh %("/bin/bash -c "#{installer} #{BRANCH}")
       end
 
       run_assertions(ruby_version: ruby_version, distro: distro)
@@ -117,9 +107,7 @@ module DockerComposeAutomation
 
       github_url = 'https://github.com'
       user_and_reponame = "ParamagicDev/#{GITHUB_REPO_NAME}/tree/#{BRANCH}"
-
       file = 'bridgetown.automation.rb'
-
       url = "#{github_url}/#{user_and_reponame}/#{file}"
 
       distro = :alpine
@@ -130,10 +118,9 @@ module DockerComposeAutomation
       ruby_version_input = inputs[:ruby_version]
       distro_input = inputs[:distro]
 
-      pull_dockerfiles
-
+      ENV['PROJECT_TYPE'] = 'new'
       run_command(ruby_version_input, distro_input) do
-        "#{docker_run} bridgetown apply #{url}"
+        remote_install(full_url)
       end
 
       run_assertions(ruby_version: ruby_version, distro: distro)
