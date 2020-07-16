@@ -10,7 +10,7 @@ module DockerComposeAutomation
   class IntegrationTest < Minitest::Test
     def setup
       Rake.rm_rf(TEST_APP)
-      ENV['DOCKER_DESTINATION'] = TEST_APP
+      ENV['DESTINATION'] = TEST_APP
       Rake.mkdir_p(TEST_APP)
     end
 
@@ -70,45 +70,20 @@ module DockerComposeAutomation
       github_url + repo_path + installer_path
     end
 
+    def path_to_installer
+      File.join(ROOT_DIR, 'installer.sh')
+    end
+
     def local_install
-      Rake.sh %("/bin/bash -c "#{installer} #{BRANCH}")
+      Rake.sh %(DESTINATION=#{TEST_APP} /bin/bash -c "#{path_to_installer}" #{BRANCH})
     end
 
     def remote_install(full_url)
-      %(/bin/bash -c "$(curl -fsSl #{full_url}) #{BRANCH}")
+      Rake.sh %(/bin/bash -c "$(curl -fsSl #{full_url})" #{BRANCH})
     end
 
     def test_it_works_with_local_automation
       Rake.cd TEST_APP
-
-      pull_dockerfiles
-
-      distro = :alpine
-      ruby_version = '2.6'
-
-      inputs = create_inputs(distro: distro, ruby_version: ruby_version)
-
-      ruby_version_input = inputs[:ruby_version]
-      distro_input = inputs[:distro]
-
-      ENV['PROJECT_TYPE'] = 'existing'
-      Rake.sh %("/bin/bash -c "#{installer} #{BRANCH}")
-
-      run_command(ruby_version_input, distro_input) do
-        Rake.sh %("/bin/bash -c "#{installer} #{BRANCH}")
-      end
-
-      run_assertions(ruby_version: ruby_version, distro: distro)
-    end
-
-    # Have to push to github first, and wait for github to update
-    def test_it_works_with_remote_automation
-      Rake.cd TEST_APP
-
-      github_url = 'https://github.com'
-      user_and_reponame = "ParamagicDev/#{GITHUB_REPO_NAME}/tree/#{BRANCH}"
-      file = 'bridgetown.automation.rb'
-      url = "#{github_url}/#{user_and_reponame}/#{file}"
 
       distro = :alpine
       ruby_version = '2.6'
@@ -119,11 +94,31 @@ module DockerComposeAutomation
       distro_input = inputs[:distro]
 
       ENV['PROJECT_TYPE'] = 'new'
-      run_command(ruby_version_input, distro_input) do
-        remote_install(full_url)
-      end
+      ENV['DOCKER_RUBY_VERSION'] = ruby_version_input
+      ENV['DOCKER_DISTRO'] = distro_input
+      local_install
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end
+
+    # Have to push to github first, and wait for github to update
+    # def test_it_works_with_remote_automation
+    #   Rake.cd TEST_APP
+
+    #   distro = :alpine
+    #   ruby_version = '2.6'
+
+    #   inputs = create_inputs(distro: distro, ruby_version: ruby_version)
+
+    #   ruby_version_input = inputs[:ruby_version]
+    #   distro_input = inputs[:distro]
+
+    #   ENV['PROJECT_TYPE'] = 'new'
+    #   run_command(ruby_version_input, distro_input) do
+    #     remote_install(full_url)
+    #   end
+
+    #   run_assertions(ruby_version: ruby_version, distro: distro)
+    # end
   end
 end

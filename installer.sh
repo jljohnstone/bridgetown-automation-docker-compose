@@ -10,6 +10,8 @@ docker_tag="bridgetown-automation-docker:latest"
 PROJECT_TYPE=$PROJECT_TYPE
 DESTINATION=$DESTINATION
 
+echo "$DESTINATION"
+
 main() {
   printf "Installing Bridgetown via Docker...\n"
   check_dependencies
@@ -35,9 +37,10 @@ clone_repo() {
 }
 
 ask_for_destination() {
-  [ -z "$DESTINATION" ] && \
-  printf "What is the directory of your bridgetown project?\n" && \
-  read DESTINATION
+  if [ -z "$DESTINATION" ]; then
+    printf "What is the directory of your bridgetown project?\n" && \
+    read DESTINATION
+  fi
 }
 
 ask_for_project_type() {
@@ -65,7 +68,9 @@ ask_for_project_type() {
 
 copy_gemfile() {
   if [ "$PROJECT_TYPE" = "new" ]; then
-    cp "$tmp_dir/templates/Gemfile.tt" "$DESTINATION/Gemfile"
+    # cp "$tmp_dir/templates/Gemfile.tt" "$DESTINATION/Gemfile"
+    echo "source 'https://rubygems.org'" >> "$DESTINATION/Gemfile"
+    echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
   fi
 }
 

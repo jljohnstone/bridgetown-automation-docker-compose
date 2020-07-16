@@ -18,11 +18,10 @@ TEST_GEMFILE = File.join(TEST_APP, 'Gemfile')
 reporter_options = { color: true }
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(reporter_options)]
 
-    def read_test_file(filename)
-      File.read(File.join(TEST_APP, filename))
-    end
+def read_test_file(filename)
+  File.read(File.join(TEST_APP, filename))
+end
 
-    def read_template_file(filename)
-      File.read(File.join(TEMPLATES_DIR, "#{filename}.tt"))
-    end
-
+def read_template_file(filename)
+  File.read(File.join(TEMPLATES_DIR, "#{filename}.tt"))
+end

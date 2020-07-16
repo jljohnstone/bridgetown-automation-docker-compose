@@ -37,10 +37,13 @@ module DockerComposeAutomation
 
     private
 
-    def ask_for_input(question, answers)
+    def ask_for_input(question, answers, env_var = nil)
       provide_input = "Please provide a number (1-#{answers.length})"
 
       allowable_answers = answers.keys
+
+      return env_var.to_i if allowable_answers.include?(env_var)
+
       loop do
         say "\n#{question}"
         answers.each { |num, string| say "#{num}.) #{string}", :cyan }
@@ -57,7 +60,8 @@ module DockerComposeAutomation
 
       answers = ruby_versions
 
-      input = ask_for_input(question, answers)
+      env_var = ENV["DOCKER_RUBY_VERSION"]
+      input = ask_for_input(question, answers, env_var)
 
       @ruby_version = answers[input]
     end
@@ -67,6 +71,7 @@ module DockerComposeAutomation
 
       answers = distros
 
+      env_var = ENV["DOCKER_DISTRO"]
       input = ask_for_input(question, answers)
 
       @distro = answers[input]
