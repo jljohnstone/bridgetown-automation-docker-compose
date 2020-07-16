@@ -104,7 +104,7 @@ module DockerComposeAutomation
       ENV['DOCKER_RUBY_VERSION'] = ruby_version_input
       ENV['DOCKER_DISTRO'] = distro_input
 
-      Rake.sh("bundle exec bridgetown new #{TEST_APP}")
+      Rake.sh("bundle exec bridgetown new #{TEST_APP} --force")
 
       run_command(ruby_version_input, distro_input) do
         Rake.sh(remote_install(full_url))
