@@ -31,6 +31,15 @@ this.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ParamagicDev/bridgetown-automation-docker-compose/master/installer.sh)"
 ```
 
+For a specific branch run:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/ParamagicDev/bridgetown-automation-docker-compose/<branch>/installer.sh) <branch>"
+```
+
+
+
+
 You will then be prompted for whether to create a new project or add to
 an existing one. It will also prompt for where the project is in your
 filesystem.

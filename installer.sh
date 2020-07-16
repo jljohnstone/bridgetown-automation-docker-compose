@@ -12,6 +12,9 @@ DESTINATION=$DESTINATION
 DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION
 DOCKER_DISTRO=$DOCKER_DISTRO
 
+echo $DOCKER_RUBY_VERSION
+echo $DOCKER_DISTRO
+
 main() {
   printf "Installing Bridgetown via Docker...\n"
   check_dependencies
@@ -96,18 +99,17 @@ build_docker_image() {
 }
 
 docker_run() {
-  docker run --rm -v "$(realpath $DESTINATION)":"$APP_DIR" \
-                  -u $(id -u $USER):$(id -g $USER) -it "$docker_tag" \
-                  bash -c "$1"
+  docker run -e "DOCKER_RUBY_VERSION=2" -e "DOCKER_DISTRO=2" --rm \
+             -v "$(realpath $DESTINATION)":"$APP_DIR" \
+             -u $(id -u $USER):$(id -g $USER) -it "$docker_tag" \
+             bash -c "$1"
 }
 
 run_docker_container() {
   if [ "$PROJECT_TYPE" = "new" ]; then
-    docker_run "DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO \
-                bundle exec bridgetown new . --apply=\"$repo_url\" --force"
+    docker_run "DOCKER_RUBY_VERSION=2 DOCKER_DISTRO=2 bundle exec bridgetown new . --apply=\"$repo_url/tree/$branch\" --force"
   elif [ "$PROJECT_TYPE" = "existing" ]; then
-    docker_run "DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO \
-                bundle exec bridgetown apply $repo_url"
+    docker_run "bundle exec bridgetown apply $repo_url/tree/$branch"
   fi
 }
 

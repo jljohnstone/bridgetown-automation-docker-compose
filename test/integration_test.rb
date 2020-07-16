@@ -62,11 +62,11 @@ module DockerComposeAutomation
     end
 
     def local_install
-      %(/bin/bash -c "#{path_to_installer}" #{BRANCH})
+      %(/bin/bash -c "#{path_to_installer} #{BRANCH}")
     end
 
     def remote_install(full_url)
-      %(/bin/bash -c "$(curl -fsSl #{full_url})" #{BRANCH})
+      %(/bin/bash -c "$(curl -fsSl #{full_url}) #{BRANCH}")
     end
 
     def test_it_works_with_local_automation
