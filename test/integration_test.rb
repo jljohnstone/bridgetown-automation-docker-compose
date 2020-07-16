@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'open3'
+require 'tempfile'
 
 GITHUB_REPO_NAME = 'bridgetown-automation-docker-compose'
 BRANCH = `git branch --show-current`.chomp.freeze || 'master'
@@ -11,31 +11,6 @@ module DockerComposeAutomation
     def setup
       Rake.rm_rf(TEST_APP)
       Rake.mkdir_p(TEST_APP)
-    end
-
-    def read_test_file(filename)
-      File.read(File.join(TEST_APP, filename))
-    end
-
-    def read_template_file(filename)
-      File.read(File.join(TEMPLATES_DIR, "#{filename}.tt"))
-    end
-
-    # If no block given, use the first input as the command
-    def run_command(*inputs)
-      cmd = yield if block_given? || inputs.shift!
-
-      Open3.popen3(cmd) do |stdin, stdout, _stderr, wait_thr|
-        wait_thr.pid
-
-        inputs.flatten.each { |input| stdin.puts(input) }
-
-        stdout.each_line do |line|
-          puts line
-        end
-
-        exit_status = wait_thr.value
-      end
     end
 
     def run_assertions(ruby_version:, distro:)
@@ -74,10 +49,66 @@ module DockerComposeAutomation
       { ruby_version: ruby_version_input, distro: distro_input }
     end
 
+    def full_url
+      github_url = 'https://raw.githubusercontent.com/'
+      repo_path = "ParamagicDev/#{GITHUB_REPO_NAME}/"
+      installer_path = "#{BRANCH}/installer.sh"
+      github_url + repo_path + installer_path
+    end
+
+    def path_to_installer
+      File.join(ROOT_DIR, 'installer.sh')
+    end
+
+    def local_install
+      %(/bin/bash -c "#{path_to_installer}" #{BRANCH})
+    end
+
+    def remote_install(full_url)
+      %(/bin/bash -c "$(curl -fsSl #{full_url})" #{BRANCH})
+    end
+
+    def simulate_input(cmd, *inputs)
+      file = Tempfile.new('expect_file.exp')
+
+      file.write('#!/usr/bin/expect -f')
+      file.write("\n")
+      file.write("spawn #{cmd}")
+
+      inputs.flatten.each do |input|
+        file.write("expect #{input[:expect]}")
+        file.write("send #{input[:send]}")
+      end
+
+      file.write('interact')
+      file.close
+      Rake.sh("expect -f #{file.path}")
+      file.unlink
+    end
+
+    def input_ary(ruby_version_input, distro_input)
+      [
+        {
+          expect: 'What is the directory of your bridgetown project?',
+          send: TEST_APP
+        },
+        {
+          expect: 'Is this for a new or existing Bridgetown project? [(N)ew, (E)xisting]',
+          send: 'new'
+        },
+        {
+          expect: '  ',
+          send: ruby_version_input
+        },
+        {
+          expect: '  ',
+          send: distro_input
+        }
+      ]
+    end
+
     def test_it_works_with_local_automation
       Rake.cd TEST_APP
-
-      Rake.sh('bundle exec bridgetown new . --force ')
 
       distro = :alpine
       ruby_version = '2.6'
@@ -87,39 +118,29 @@ module DockerComposeAutomation
       ruby_version_input = inputs[:ruby_version]
       distro_input = inputs[:distro]
 
-      run_command(ruby_version_input, distro_input) do
-        'bridgetown apply ../bridgetown.automation.rb'
-      end
+      simulate_input(local_install, inputs_ary(ruby_version_input, distro_input))
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end
 
     # Have to push to github first, and wait for github to update
-    def test_it_works_with_remote_automation
-      Rake.cd TEST_APP
+    # def test_it_works_with_remote_automation
+    #   Rake.cd TEST_APP
 
-      github_url = 'https://github.com'
-      user_and_reponame = "ParamagicDev/#{GITHUB_REPO_NAME}/tree/#{BRANCH}"
+    #   distro = :alpine
+    #   ruby_version = '2.6'
 
-      file = 'bridgetown.automation.rb'
+    #   inputs = create_inputs(distro: distro, ruby_version: ruby_version)
 
-      url = "#{github_url}/#{user_and_reponame}/#{file}"
+    #   ruby_version_input = inputs[:ruby_version]
+    #   distro_input = inputs[:distro]
 
-      distro = :alpine
-      ruby_version = '2.6'
+    #   ENV['PROJECT_TYPE'] = 'new'
+    #   run_command(ruby_version_input, distro_input) do
+    #     remote_install(full_url)
+    #   end
 
-      inputs = create_inputs(distro: distro, ruby_version: ruby_version)
-
-      ruby_version_input = inputs[:ruby_version]
-      distro_input = inputs[:distro]
-
-      Rake.sh('bundle exec bridgetown new . --force ')
-
-      run_command(ruby_version_input, distro_input) do
-        "bridgetown apply #{url}"
-      end
-
-      run_assertions(ruby_version: ruby_version, distro: distro)
-    end
+    #   run_assertions(ruby_version: ruby_version, distro: distro)
+    # end
   end
 end
