@@ -15,6 +15,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build and test with Rake / Docker
         run: |
-          sudo docker service update --force
+          docker service update --force web
           source docker.env
           docker-compose up --build --exit-code-from web
