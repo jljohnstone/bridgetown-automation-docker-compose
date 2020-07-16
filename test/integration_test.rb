@@ -80,32 +80,37 @@ module DockerComposeAutomation
       ruby_version_input = inputs[:ruby_version]
       distro_input = inputs[:distro]
 
-      ENV["PROJECT_TYPE"] = "new"
-      ENV["DOCKER_RUBY_VERSION"] = ruby_version_input
-      ENV["DOCKER_DISTRO"] = distro_input
+      ENV['PROJECT_TYPE'] = 'new'
+      ENV['DOCKER_RUBY_VERSION'] = ruby_version_input
+      ENV['DOCKER_DISTRO'] = distro_input
       Rake.sh("DOCKER_DISTRO=#{distro_input} DOCKER_RUBY_VERSION=#{ruby_version_input} #{local_install}")
 
       run_assertions(ruby_version: ruby_version, distro: distro)
     end
 
     # Have to push to github first, and wait for github to update
-    # def test_it_works_with_remote_automation
-    #   Rake.cd TEST_APP
+    def test_it_works_with_remote_automation
+      Rake.cd TEST_APP
 
-    #   distro = :alpine
-    #   ruby_version = '2.6'
+      distro = :alpine
+      ruby_version = '2.6'
 
-    #   inputs = create_inputs(distro: distro, ruby_version: ruby_version)
+      inputs = create_inputs(distro: distro, ruby_version: ruby_version)
 
-    #   ruby_version_input = inputs[:ruby_version]
-    #   distro_input = inputs[:distro]
+      ruby_version_input = inputs[:ruby_version]
+      distro_input = inputs[:distro]
 
-    #   ENV['PROJECT_TYPE'] = 'new'
-    #   run_command(ruby_version_input, distro_input) do
-    #     remote_install(full_url)
-    #   end
+      ENV['PROJECT_TYPE'] = 'existing'
+      ENV['DOCKER_RUBY_VERSION'] = ruby_version_input
+      ENV['DOCKER_DISTRO'] = distro_input
 
-    #   run_assertions(ruby_version: ruby_version, distro: distro)
-    # end
+      Rake.sh("bundle exec bridgetown new #{TEST_APP}")
+
+      run_command(ruby_version_input, distro_input) do
+        Rake.sh(remote_install(full_url))
+      end
+
+      run_assertions(ruby_version: ruby_version, distro: distro)
+    end
   end
 end
