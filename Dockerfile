@@ -7,7 +7,7 @@ RUN apk add --no-cache --virtual \
    curl git vim \
    libnotify-dev \
    # needed for testing
-   docker docker-compose
+   docker docker-compose expect
 
 FROM builder as bridgetownrb-app
 

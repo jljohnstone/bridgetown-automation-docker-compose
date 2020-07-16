@@ -38,11 +38,11 @@ module DockerComposeAutomation
     private
 
     def ask_for_input(question, answers, env_var = nil)
-      provide_input = "Please provide a number (1-#{answers.length})"
-
       allowable_answers = answers.keys
 
       return env_var.to_i if allowable_answers.include?(env_var)
+
+      provide_input = "Please provide a number (1-#{answers.length})"
 
       loop do
         say "\n#{question}"
@@ -71,7 +71,7 @@ module DockerComposeAutomation
 
       answers = distros
 
-      env_var = ENV["DOCKER_DISTRO"]
+      env_var = ENV['DOCKER_DISTRO']
       input = ask_for_input(question, answers)
 
       @distro = answers[input]
