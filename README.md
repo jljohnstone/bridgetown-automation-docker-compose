@@ -117,7 +117,7 @@ with the Ruby version pulled down by Docker. Check out
 list of officially supported ruby versions.
 
 Sometimes you may run into an issue with the binding of `node-sass`. To
-fix the issue simply run:
+fix the issue simply run
 
 ```bash
 docker-compose run --rm web npm reinstall node-sass
