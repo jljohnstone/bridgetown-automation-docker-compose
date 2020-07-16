@@ -104,7 +104,7 @@ docker_run() {
 
 run_docker_container() {
   if [ "$PROJECT_TYPE" = "new" ]; then
-    docker_run "bundle exec bridgetown new . --apply=\"$repo_url/tree/$branch\" --force"
+    docker_run "DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO bundle exec bridgetown new . --apply=\"$repo_url/tree/$branch\" --force"
   elif [ "$PROJECT_TYPE" = "existing" ]; then
     docker_run "bundle exec bridgetown apply $repo_url/tree/$branch"
   fi
