@@ -16,5 +16,5 @@ jobs:
       - name: Build with Docker
         run: |
           source docker.env
-          docker-compose up -e CI=true --build --exit-code-from web
+          docker-compose up --build --exit-code-from web
 

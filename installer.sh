@@ -60,6 +60,8 @@ ask_for_project_type() {
       PROJECT_TYPE="new"
 
       [ "$(ls -A $DESTINATION)" ] && echo "Directory not empty. Aborting..." && exit 1
+      mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
+      copy_gemfile
       break
     fi
   done
@@ -69,45 +71,37 @@ ask_for_project_type() {
 }
 
 copy_gemfile() {
-  if [ "$PROJECT_TYPE" = "new" ]; then
-    echo "source 'https://rubygems.org'" > "$DESTINATION/Gemfile"
-    echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
-  fi
+  touch "$DESTINATION/Gemfile"
+  echo "source 'https://rubygems.org'" > "$DESTINATION/Gemfile"
+  echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
+  ls "$DESTINATION"
 }
 
 build_docker_image() {
   # env vars
   source "$tmp_dir/docker.env"
 
-  mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
-  copy_gemfile
 
   printf "Building your docker image...\n\n"
   source "$tmp_dir/docker.env"
+  cd "$DESTINATION"
   docker build  -t $docker_tag \
                 -f $tmp_dir/Dockerfile \
                 --build-arg DOCKER_USER \
                 --build-arg USER_ID \
                 --build-arg GROUP_ID \
                 --build-arg APP_DIR \
-                "$DESTINATION"
+                .
+                # "$DESTINATION"
 
   printf "Successfully built your image for Bridgetown.\n\n"
 }
 
 docker_run() {
-  if [ CI = "true" ]; then
-    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
-               -v "$(realpath $DESTINATION)":"$APP_DIR" \
-               -u $USER_ID:$GROUP_ID -it "$docker_tag" \
-               bash -c "$1"
-
-  else
-    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
-               -v "$(realpath $DESTINATION)":"$APP_DIR" \
-               -u $USER_ID:$GROUP_ID "$docker_tag" \
-               bash -c "$1"
-  fi
+  docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
+              -v bridgetown-docker:"$APP_DIR" \
+              -u $USER_ID:$GROUP_ID -it "$docker_tag" \
+              bash -c "$1"
 }
 
 run_docker_container() {
