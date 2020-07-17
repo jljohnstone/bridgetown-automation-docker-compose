@@ -90,7 +90,7 @@ build_docker_image() {
                 --build-arg USER_ID \
                 --build-arg GROUP_ID \
                 --build-arg APP_DIR \
-                "$(realpath DESTINATION$"
+                "$DESTINATION"
 
   printf "Successfully built your image for Bridgetown.\n\n"
 }
