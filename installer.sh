@@ -60,9 +60,8 @@ ask_for_project_type() {
     elif [ "$PROJECT_TYPE" = "new" ] || [ "$PROJECT_TYPE" = "n" ]; then
       PROJECT_TYPE="new"
 
-      mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
       [ "$(ls -A $DESTINATION)" ] && echo "Directory not empty. Aborting..." && exit 1
-      copy_gemfile
+      mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
 
       break
     fi
@@ -73,17 +72,17 @@ ask_for_project_type() {
 }
 
 copy_gemfile() {
-  touch "$DESTINATION/Gemfile"
-  echo "source 'https://rubygems.org'" > "$DESTINATION/Gemfile"
-  echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
+  if [ "$PROJECT_TYPE" = "new" ]; then
+    echo "source 'https://rubygems.org'" > "$DESTINATION/Gemfile"
+    echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
+  fi
 }
 
 build_docker_image() {
-  # env vars
-  source "$tmp_dir/docker.env"
 
-
+  copy_gemfile
   printf "Building your docker image...\n\n"
+  # env vars
   source "$tmp_dir/docker.env"
   docker build  -t $docker_tag \
                 -f $tmp_dir/Dockerfile \
@@ -91,7 +90,7 @@ build_docker_image() {
                 --build-arg USER_ID \
                 --build-arg GROUP_ID \
                 --build-arg APP_DIR \
-                "$DESTINATION"
+                "$(realpath DESTINATION)"
 
   printf "Successfully built your image for Bridgetown.\n\n"
 }
