@@ -74,7 +74,6 @@ copy_gemfile() {
   touch "$DESTINATION/Gemfile"
   echo "source 'https://rubygems.org'" > "$DESTINATION/Gemfile"
   echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
-  ls "$DESTINATION"
 }
 
 build_docker_image() {
@@ -84,23 +83,22 @@ build_docker_image() {
 
   printf "Building your docker image...\n\n"
   source "$tmp_dir/docker.env"
-  cd "$DESTINATION"
   docker build  -t $docker_tag \
                 -f $tmp_dir/Dockerfile \
                 --build-arg DOCKER_USER \
                 --build-arg USER_ID \
                 --build-arg GROUP_ID \
                 --build-arg APP_DIR \
-                "$DESTINATION"
+                $(pwd)
 
   printf "Successfully built your image for Bridgetown.\n\n"
 }
 
 docker_run() {
   docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
-              -v bridgetown-docker:"$APP_DIR" \
-              -u $USER_ID:$GROUP_ID -it "$docker_tag" \
-              bash -c "$1"
+             -v $(pwd):"$APP_DIR" \
+             -u $USER_ID:$GROUP_ID -it "$docker_tag" \
+             bash -c "$1"
 }
 
 run_docker_container() {
