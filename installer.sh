@@ -11,6 +11,7 @@ PROJECT_TYPE=$PROJECT_TYPE
 DESTINATION=$DESTINATION
 DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION
 DOCKER_DISTRO=$DOCKER_DISTRO
+CI=$CI
 
 main() {
   printf "Installing Bridgetown via Docker...\n"
@@ -96,15 +97,15 @@ build_docker_image() {
 }
 
 docker_run() {
-  docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
-              -v bridgetown-docker:"$APP_DIR" \
+  docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO -e CI --rm \
+              -v "$DESTINATION":"$APP_DIR" \
               -u $USER_ID:$GROUP_ID -it "$docker_tag" \
               bash -c "$1"
 }
 
 run_docker_container() {
   if [ "$PROJECT_TYPE" = "new" ]; then
-    docker_run "DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO bundle exec bridgetown new . --apply=\"$repo_url/tree/$branch\" --force"
+    docker_run "CI=$CI DOCKER_RUBY_VERSION=$DOCKER_RUBY_VERSION DOCKER_DISTRO=$DOCKER_DISTRO bundle exec bridgetown new . --apply=\"$repo_url/tree/$branch\" --force"
   elif [ "$PROJECT_TYPE" = "existing" ]; then
     docker_run "bundle exec bridgetown apply $repo_url/tree/$branch"
   fi
