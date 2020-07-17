@@ -59,9 +59,10 @@ ask_for_project_type() {
     elif [ "$PROJECT_TYPE" = "new" ] || [ "$PROJECT_TYPE" = "n" ]; then
       PROJECT_TYPE="new"
 
-      [ "$(ls -A $DESTINATION)" ] && echo "Directory not empty. Aborting..." && exit 1
       mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
+      [ "$(ls -A $DESTINATION)" ] && echo "Directory not empty. Aborting..." && exit 1
       copy_gemfile
+
       break
     fi
   done
@@ -74,7 +75,6 @@ copy_gemfile() {
   touch "$DESTINATION/Gemfile"
   echo "source 'https://rubygems.org'" > "$DESTINATION/Gemfile"
   echo "gem 'bridgetown'" >> "$DESTINATION/Gemfile"
-  ls "$DESTINATION"
 }
 
 build_docker_image() {
@@ -84,14 +84,13 @@ build_docker_image() {
 
   printf "Building your docker image...\n\n"
   source "$tmp_dir/docker.env"
-  cd "$DESTINATION"
   docker build  -t $docker_tag \
                 -f $tmp_dir/Dockerfile \
                 --build-arg DOCKER_USER \
                 --build-arg USER_ID \
                 --build-arg GROUP_ID \
                 --build-arg APP_DIR \
-                "$DESTINATION"
+                "$(realpath DESTINATION$"
 
   printf "Successfully built your image for Bridgetown.\n\n"
 }
