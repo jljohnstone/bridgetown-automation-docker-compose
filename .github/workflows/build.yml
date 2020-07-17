@@ -16,8 +16,8 @@ jobs:
       - name: Build with Docker
         run: |
           source docker.env
-          docker-compose build --exit-code-from web
+          docker-compose build
       - name: Test with Rake
         run: |
-          docker-compose run -e CI=true web bundle exec rake test
+          docker-compose run --exit-code-from web -e CI=true web bundle exec rake test
         
