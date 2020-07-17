@@ -61,8 +61,6 @@ ask_for_project_type() {
       PROJECT_TYPE="new"
 
       [ "$(ls -A $DESTINATION)" ] && echo "Directory not empty. Aborting..." && exit 1
-      mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
-
       break
     fi
   done
@@ -79,10 +77,13 @@ copy_gemfile() {
 }
 
 build_docker_image() {
-
-  copy_gemfile
-  printf "Building your docker image...\n\n"
   # env vars
+  source "$tmp_dir/docker.env"
+
+  mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
+  copy_gemfile
+
+  printf "Building your docker image...\n\n"
   source "$tmp_dir/docker.env"
   docker build  -t $docker_tag \
                 -f $tmp_dir/Dockerfile \
@@ -90,21 +91,22 @@ build_docker_image() {
                 --build-arg USER_ID \
                 --build-arg GROUP_ID \
                 --build-arg APP_DIR \
-                "$(realpath DESTINATION)"
+                "$DESTINATION"
 
   printf "Successfully built your image for Bridgetown.\n\n"
 }
 
 docker_run() {
-  if [ "$CI" = true ]; then
-    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO -e CI --rm \
-               -v "$(realpath DESTINATION)":"$APP_DIR" \
-               -u $USER_ID:$GROUP_ID "$docker_tag" \
-               bash -c "$1"
-  else
-    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO -e CI --rm \
-               -v "$(realpath DESTINATION)":"$APP_DIR" \
+  if [ CI = "true" ]; then
+    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
+               -v "$(realpath $DESTINATION)":"$APP_DIR" \
                -u $USER_ID:$GROUP_ID -it "$docker_tag" \
+               bash -c "$1"
+
+  else
+    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
+               -v "$(realpath $DESTINATION)":"$APP_DIR" \
+               -u $USER_ID:$GROUP_ID "$docker_tag" \
                bash -c "$1"
   fi
 }
