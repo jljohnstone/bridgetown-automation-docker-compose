@@ -1,4 +1,4 @@
-![build](https://github.com/ParamagicDev/bridgetown-automation-docker-compose/workflows/test/badge.svg)
+![build](https://github.com/ParamagicDev/bridgetown-automation-docker-compose/workflows/Ruby/badge.svg)
 
 # Purpose
 
