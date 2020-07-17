@@ -13,7 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build and test with Rake / Docker
+      - name: Build with Docker
         run: |
           source docker.env
-          docker-compose up -e CI=true --build --exit-code-from web
+          docker-compose build --exit-code-from web
+      - name: Test with Rake
+        run: |
+          docker-compose run -e CI=true web bundle exec rake test
+        
