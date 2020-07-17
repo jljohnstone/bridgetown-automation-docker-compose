@@ -97,18 +97,18 @@ build_docker_image() {
 }
 
 docker_run() {
-  if [ CI = "true" ]; then
-    docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
-               -v "$(realpath $DESTINATION)":"$APP_DIR" \
-               -u $USER_ID:$GROUP_ID "$docker_tag" \
-               bash -c "$1"
+  # if [ "$CI" = "true" ]; then
+  #   docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
+  #              -v "$(realpath $DESTINATION)":"$APP_DIR" \
+  #              -u $USER_ID:$GROUP_ID "$docker_tag" \
+  #              bash -c "$1"
 
-  else
+  # else
     docker run -e DOCKER_RUBY_VERSION -e DOCKER_DISTRO --rm \
                -v "$(realpath $DESTINATION)":"$APP_DIR" \
                -u $USER_ID:$GROUP_ID -it "$docker_tag" \
                bash -c "$1"
-  fi
+  # fi
 }
 
 run_docker_container() {
