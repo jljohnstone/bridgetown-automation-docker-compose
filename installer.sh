@@ -41,6 +41,7 @@ ask_for_destination() {
   if [ -z "$DESTINATION" ]; then
     printf "What is the directory of your bridgetown project?\n" && \
     read DESTINATION
+    mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
   fi
 }
 
@@ -80,7 +81,6 @@ build_docker_image() {
   # env vars
   source "$tmp_dir/docker.env"
 
-  mkdir -p "$DESTINATION" || (echo "Unable to create new directory" && exit 1)
   copy_gemfile
 
   printf "Building your docker image...\n\n"
