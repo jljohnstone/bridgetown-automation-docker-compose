@@ -124,8 +124,9 @@ run_docker_container() {
 closing_message() {
   cd "$DESTINATION"
   git add .
-  git commit -m "Add docker via automation"
+  git commit -m "Add docker via automation" -q
   cd -
+  printf "Files commited to git\n\n"
   printf "Successfully added Docker to your bridgetown project\n"
   printf "To use docker in your new project simply do the following:\n\n"
   printf "cd $DESTINATION && source docker.env && docker-compose up --build"
