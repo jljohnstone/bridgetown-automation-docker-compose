@@ -80,7 +80,6 @@ require_libs
 
 copy_template_files
 
-run "git add . && git commit -m 'add Docker via automation'"
 say "\nSuccessfully added files for Docker to your repo!", :green
 say "\nIf you're on Linux, to prevent permission issues, make sure to run:", :magenta
 say '`source ./docker.env && docker-compose up --build`', :red
