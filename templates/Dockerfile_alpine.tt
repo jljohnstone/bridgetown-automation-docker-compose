@@ -1,6 +1,6 @@
 FROM ruby:<%= @ruby_version %>-alpine as builder
 
-RUN apk add --no-cache --virtual \
+RUN apk add --no-cache \
     # required
     nodejs-dev yarn bash \
     tzdata build-base libffi-dev \
