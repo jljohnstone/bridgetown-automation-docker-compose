@@ -23,6 +23,7 @@ services:
       - .:${APP_DIR:-/home/user/bridgetown-app}
       # this seperates node_modules from the host
       - node_modules:${APP_DIR:-/home/user/bridgetown-app}/node_modules
+      - bundler:/usr/local/bundle
 
 volumes:
   node_modules:
