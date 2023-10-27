@@ -4,7 +4,7 @@ set -e
 
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
 repo_name="bridgetown-automation-docker-compose"
-repo_url="https://github.com/ParamagicDev/$repo_name"
+repo_url="https://github.com/jljohnstone/$repo_name"
 branch="${1:-master}"
 docker_tag="bridgetown-automation-docker:latest"
 PROJECT_TYPE=$PROJECT_TYPE
@@ -28,7 +28,7 @@ main() {
 # Check if docker exists
 check_dependencies() {
   command -v docker || (echo "Docker executable not found" && exit 1)
-  command -v docker-compose || (echo "Docker Compose executable not found" && exit 1)
+  command -v docker compose version || (echo "Docker Compose executable not found" && exit 1)
   command -v git || (echo "git executable not found" && exit 1)
 }
 
