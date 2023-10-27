@@ -1,7 +1,7 @@
 FROM ruby:3.2.2-bookworm as builder
 
 # Install system dependencies & clean them up
-RUN sudo apt update && sudo apt install -y \
+RUN apt update && apt install -y \
    nodejs-dev yarn bash \
    tzdata build-base libffi-dev \
    curl git vim \
