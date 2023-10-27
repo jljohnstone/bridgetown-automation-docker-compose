@@ -5,7 +5,7 @@ RUN apt update && apt install -y \
    libnode-dev yarn bash \
    tzdata build-base libffi-dev \
    curl git vim \
-   libnotify-dev \
+   libnotify-dev
    # needed for testing
    #docker docker-compose expect
 
