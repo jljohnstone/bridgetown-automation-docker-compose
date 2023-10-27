@@ -18,7 +18,7 @@ ARG DOCKER_USER=${DOCKER_USER:-user}
 ARG APP_DIR=${APP_DIR:-/home/user/bridgetown-app}
 
 # Create a non-root user
-RUN addgroup --gid $GROUP_ID --system $GROUP_ID
+RUN groupadd --gid $GROUP_ID --system
 RUN adduser --disabled-password -G $GROUP_ID --uid $USER_ID -S $DOCKER_USER
 
 # Create and then own the directory to fix permissions issues
