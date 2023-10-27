@@ -2,7 +2,7 @@ FROM ruby:3.2.2-bookworm as builder
 
 # Install system dependencies & clean them up
 RUN apt update && apt install -y \
-   libnode-dev yarn bash \
+   libnode-dev yarnpkg bash \
    tzdata libffi-dev \
    curl git vim \
    libnotify-dev
