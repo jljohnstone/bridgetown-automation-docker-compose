@@ -19,7 +19,7 @@ ARG APP_DIR=${APP_DIR:-/home/user/bridgetown-app}
 
 # Create a non-root user
 RUN addgroup --system --gid $GROUP_ID dockergroup
-RUN adduser --disabled-password -G $GROUP_ID --uid $USER_ID -S $DOCKER_USER
+RUN adduser --disabled-password --system --gid $GROUP_ID --uid $USER_ID $DOCKER_USER
 
 # Create and then own the directory to fix permissions issues
 RUN mkdir -p $APP_DIR
