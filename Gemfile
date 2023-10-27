@@ -2,9 +2,9 @@
 
 source 'https://rubygems.org'
 
-gem 'bridgetown', '~> 0.15.0'
+gem 'bridgetown'
 gem 'minitest'
-gem 'minitest-reporters', '~> 1.4'
+gem 'minitest-reporters'
 gem 'rake'
 gem 'rubocop'
 gem 'thor'
